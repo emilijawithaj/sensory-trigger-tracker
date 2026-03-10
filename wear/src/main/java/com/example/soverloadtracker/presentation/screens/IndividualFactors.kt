@@ -24,7 +24,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.presentation.dataStorage.LogData
+import com.example.soverloadtracker.presentation.LogData
 
 
 /**

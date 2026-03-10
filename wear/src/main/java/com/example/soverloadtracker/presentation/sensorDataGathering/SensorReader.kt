@@ -1,4 +1,4 @@
-package com.example.soverloadtracker.presentation.sensorDataGathering
+package com.example.soverloadtracker.presentation
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaRecorder
+import android.os.Build
 import android.util.Log
 import androidx.health.services.client.ExerciseUpdateCallback
 import androidx.health.services.client.HealthServices
@@ -28,7 +29,7 @@ import kotlin.math.log10
 class SensorReader(private val context: Context,
                    private val coroutineScope: CoroutineScope) {
     val dataProcessor = SensorDataComputer()
-    private val delayTime = 3000L
+    private val delayTime = 3000L;
     // HR reading
     private val healthServicesClient by lazy { HealthServices.getClient(context) }
     private val exerciseClient by lazy { healthServicesClient.exerciseClient }
@@ -194,10 +195,10 @@ class SensorReader(private val context: Context,
                 setOutputFile(outputFile.absolutePath)
                 prepare()
                 start()
-                Log.d("SoundRecord", "MediaRecorder started successfully.")
+                Log.d("SoundRecorder", "MediaRecorder started successfully.")
             }
         } catch (e: IOException) {
-            Log.e("SoundRecord", "MediaRecorder prepare() failed", e)
+            Log.e("SoundRecorder", "MediaRecorder prepare() failed", e)
             recorder = null // Ensure recorder is null if start fails
         }
     }
@@ -216,12 +217,12 @@ class SensorReader(private val context: Context,
             startRecorder()
             // If the recorder failed to start, don't
     if (recorder == null) {
-        Log.e("SoundRecord", "Cannot take reading, recorder is not initialized.")
+        Log.e("SoundRecorder", "Cannot take reading, recorder is not initialized.")
         //TODO THROW HERE
         return@launch
     }
 
-    Log.d("SoundRecord", "Starting 5-second sound measurement.")
+    Log.d("SoundRecorder", "Starting 5-second sound measurement.")
     soundReadings.clear()
 
     val startTime = System.currentTimeMillis()
@@ -239,7 +240,7 @@ class SensorReader(private val context: Context,
     }
 
     stopRecorder()
-    Log.d("SoundRecord", "Finished 5-second sound measurement. Readings: ${soundReadings.size}")
+    Log.d("SoundRecorder", "Finished 5-second sound measurement. Readings: ${soundReadings.size}")
 }
 }
 
@@ -252,9 +253,9 @@ class SensorReader(private val context: Context,
             try {
                 stop()
                 release()
-                Log.d("SoundRecord", "MediaRecorder stopped and released.")
+                Log.d("SoundRecorder", "MediaRecorder stopped and released.")
             } catch (e: Exception) {
-                Log.w("SoundRecord", "Failed to stop MediaRecorder cleanly", e)
+                Log.w("SoundRecorder", "Failed to stop MediaRecorder cleanly", e)
             }
         }
         recorder = null

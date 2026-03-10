@@ -22,24 +22,17 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.presentation.dataStorage.SqLiteDatabase
-import com.example.soverloadtracker.presentation.dataStorage.LogData
+import com.example.soverloadtracker.SqLiteDatabase
+import com.example.soverloadtracker.presentation.LogData
 import kotlinx.coroutines.delay
 import java.time.Instant
 
-/**
- * Navigation graph for the app.
- * @param navController Navigation controller
- * @param activeLog Log being constructed
- * @param database Database to save logs to
- * @param goToPermissions Callback to request permissions
- * @param createLog Callback to function to create a new log
- */
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     activeLog: LogData?,
     database: SqLiteDatabase,
+    onLogUpdate: (LogData) -> Unit,
     goToPermissions: () -> Unit,
     createLog: (Instant) -> LogData,
 ) {
@@ -55,7 +48,8 @@ fun AppNavigation(
                 logButtonOnClick = {
                     goToPermissions()
                     navController.navigate(Destinations.LOADING)
-                }
+                },
+                onSettingsClick = { navController.navigate(Destinations.SETTINGS) }
             )
         }
 
@@ -136,7 +130,7 @@ fun AppNavigation(
         // Tag menu
         composable(Destinations.TAGS_MENU) {
             AddTagsPage(activeLog!!) { log ->
-                activeLog = log
+                activeLog = log;
                 activeLog?.let {
                     database.addLogRecord(it)
                     navController.navigate(Destinations.END_BUTTON) {
@@ -154,6 +148,11 @@ fun AppNavigation(
                 }
             }
         }
+
+        //Settings
+        composable(Destinations.SETTINGS) {
+            SettingsPage()
+        }
     }
 }
 
@@ -165,6 +164,7 @@ object Destinations {
     const val FACTOR_MENU = "factorMenu"
     const val TAGS_MENU = "tagsMenu"
     const val END_BUTTON = "endButton"
+    const val SETTINGS = "settings"
     const val CATEGORY_ROUTE = "category/{type}"
     fun categoryPath(type: String) = "category/$type"
 }

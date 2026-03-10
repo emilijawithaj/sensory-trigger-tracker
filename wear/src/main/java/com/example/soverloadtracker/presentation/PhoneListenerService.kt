@@ -5,7 +5,7 @@ package com.example.soverloadtracker.presentation
 
 
 import android.util.Log
-import com.example.soverloadtracker.presentation.dataStorage.SqLiteDatabase
+import com.example.soverloadtracker.SqLiteDatabase
 import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.PutDataMapRequest

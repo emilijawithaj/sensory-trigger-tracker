@@ -45,4 +45,15 @@
     <string name="tag_prompt">Tag name…</string>
     <string name="add_tag_button">Add Tag</string>
 
+    <!-- settings -->
+    <string name="settings_button">Settings</string>
+    <string name="background_tracking_setting">Background tracking</string>
+    <string name="background_tracking_explanation">Constantly track Heart Rate and sensor data and suggest potentially triggering environments by flagging when Heart Rate is high and a tracked factor is identified.</string>
+    <string name="automatic_factor_tracking">Automatic Factor Tracking</string>
+    <string name="automatic_factors_description">Automatically select which factors to track based on historic prevalence.</string>
+    <string name="manual_tracking_selection">Manual tracking selection:</string>
+    <string name="bright_lights">Bright Lights</string>
+    <string name="strobing_lights">Strobing Lights</string>
+    <string name="loud_background_noise">Loud Background Noise</string>
+
 </resources>

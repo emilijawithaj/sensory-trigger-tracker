@@ -10,9 +10,6 @@ import com.example.soverloadtracker.R
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-/**
- * Activity holding the details view fragments (factors & logs)
- */
 class DetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

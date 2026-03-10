@@ -15,7 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.soverloadtracker.FrequencyCalcHelper
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
+import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.WatchListenerService
 import com.example.soverloadtracker.dataStorage.LogData
 import com.google.android.material.chip.Chip
@@ -24,10 +24,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.time.Instant
 
-/**
- * Activity for editing a log selected from the Logs fragment page
- * Requires a log timestamp as an intent extra to function
- */
 class EditLogActivity(): AppCompatActivity() {
     val database by lazy { SqLiteDatabase.getInstance(this) }
     private lateinit var log: LogData

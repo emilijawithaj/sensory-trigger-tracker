@@ -1,9 +1,10 @@
-package com.example.soverloadtracker.presentation.dataStorage
+package com.example.soverloadtracker
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.soverloadtracker.presentation.LogData
 import java.time.Instant
 
 class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
@@ -62,26 +63,17 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
                 val dateTime = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATETIME))
                 val avgLux = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_AVG_LUX))
                 val luxStdev = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_LUX_STDEV))
-                val lightOther =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIGHT_OTHER)) == 1
+                val lightOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIGHT_OTHER)) == 1
                 val avgDecibels = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_AVG_DECIBELS))
-                val noiseOther =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOISE_OTHER)) == 1
-                val smellStrong =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_STRONG)) == 1
-                val smellOther =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_OTHER)) == 1
-                val tactileBad =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_BAD)) == 1
-                val tactilePersonalContact =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_PERSONALCONTACT)) == 1
-                val tactileOther =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_OTHER)) == 1
-                val tasteStrong =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_STRONG)) == 1
+                val noiseOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NOISE_OTHER)) == 1
+                val smellStrong = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_STRONG)) == 1
+                val smellOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_OTHER)) == 1
+                val tactileBad = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_BAD)) == 1
+                val tactilePersonalContact = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_PERSONALCONTACT)) == 1
+                val tactileOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_OTHER)) == 1
+                val tasteStrong = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_STRONG)) == 1
                 val tasteBad = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_BAD)) == 1
-                val tasteOther =
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_OTHER)) == 1
+                val tasteOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_OTHER)) == 1
 
                 //format data correctly for object and add to list
                 val dateTimeO = Instant.parse(dateTime)
@@ -256,6 +248,9 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     }
 
 
+
+
+
     /**
      * Attempts to retrieve a specific log
      * @param dateTime dateTime ID of the log, as a String
@@ -276,10 +271,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             val smellStrong = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_STRONG)) == 1
             val smellOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SMELL_OTHER)) == 1
             val tactileBad = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_BAD)) == 1
-            val tactilePersonalContact =
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_PERSONALCONTACT)) == 1
-            val tactileOther =
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_OTHER)) == 1
+            val tactilePersonalContact = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_PERSONALCONTACT)) == 1
+            val tactileOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TACTILE_OTHER)) == 1
             val tasteStrong = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_STRONG)) == 1
             val tasteBad = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_BAD)) == 1
             val tasteOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TASTE_OTHER)) == 1
@@ -328,6 +321,7 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     }
 
 
+
     //COMPANION OBJ
     companion object {
         private var instance: SqLiteDatabase? = null
@@ -341,7 +335,6 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             }
             return instance!!
         }
-
         private const val DATABASE_VERSION = 1
         private const val DATABASE_NAME = "soverloadtracker.db"
         private const val TABLE_LOG = "logs"

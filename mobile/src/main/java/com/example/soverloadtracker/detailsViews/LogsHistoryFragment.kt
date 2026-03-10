@@ -11,12 +11,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.soverloadtracker.FrequencyCalcHelper
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
+import com.example.soverloadtracker.SqLiteDatabase
 import com.google.android.material.card.MaterialCardView
 
-/**
- * Fragment for a list of all logs by date and time
- */
 class LogsHistoryFragment : Fragment() {
     val database by lazy { SqLiteDatabase.getInstance(requireContext()) }
 

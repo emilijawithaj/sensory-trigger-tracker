@@ -28,7 +28,7 @@ import com.example.soverloadtracker.R
  * @param logButtonOnClick Callback to initiate a log
  */
 @Composable
-fun LogButton(logButtonOnClick: () -> Unit) {
+fun LogButton(logButtonOnClick: () -> Unit, onSettingsClick: () -> Unit) {
     Box() {
         //LOG button
         Button(
@@ -44,6 +44,30 @@ fun LogButton(logButtonOnClick: () -> Unit) {
             Text(
                 stringResource(R.string.log_button),
                 textAlign = TextAlign.Center
+            )
+        }
+
+        //Settings button
+        Button(
+            onClick = { onSettingsClick() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 12.dp)
+                .fillMaxWidth(0.6f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = stringResource(R.string.settings_button),
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.settings_button),
+                style = MaterialTheme.typography.labelMedium
             )
         }
     }

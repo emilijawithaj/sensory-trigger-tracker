@@ -28,14 +28,9 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.presentation.dataStorage.LogData
+import com.example.soverloadtracker.presentation.LogData
 
 
-/**
- * Page for user to enter tags as text and attach them to the log
- * @param currentLog Log being constructed
- * @param onNext Callback to move back to menu page
- */
 @Composable
 fun AddTagsPage(currentLog: LogData, onNext: (LogData) -> Unit) {
     var tagText by remember { mutableStateOf("") }

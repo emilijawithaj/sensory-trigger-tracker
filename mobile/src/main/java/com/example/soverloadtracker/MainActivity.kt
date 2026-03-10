@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
 import com.example.soverloadtracker.detailsViews.DetailsActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
@@ -24,9 +23,6 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 
 
-/**
- * Main activity of the application
- */
 class MainActivity : AppCompatActivity() {
     val database by lazy { SqLiteDatabase.getInstance(this) }
 

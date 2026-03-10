@@ -1,9 +1,11 @@
-package com.example.soverloadtracker.dataStorage
+package com.example.soverloadtracker
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.example.soverloadtracker.dataStorage.LogData
+import com.example.soverloadtracker.dataStorage.Tag
 import java.time.Instant
 
 class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
@@ -246,11 +248,11 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     }
 
     /**
-     * Updates a record
-     * @param dateTime dateTime ID of log to replace, as Instant
-     * @param logData LogData object, sensor related and dateTime values of which will be disregarded
-     * @throws NoSuchElementException if log not found
-     */
+    * Updates a record
+    * @param dateTime dateTime ID of log to replace, as Instant
+    * @param logData LogData object, sensor related and dateTime values of which will be disregarded
+    * @throws NoSuchElementException if log not found
+    */
     @Throws(NoSuchElementException::class)
     fun updateLogRecord(dateTime: Instant, logData: LogData) {
         val logValues = ContentValues()
@@ -294,9 +296,9 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
 
             //add and push tag values
             for (tag in logData.tags) {
-                tagValues.put(COLUMN_TAG, tag)
-                tagValues.put(COLUMN_TAG_DATETIME, dateTime.toString())
-                db.insert(TABLE_TAGS, null, tagValues)
+                    tagValues.put(COLUMN_TAG, tag)
+                    tagValues.put(COLUMN_TAG_DATETIME, dateTime.toString())
+                    db.insert(TABLE_TAGS, null, tagValues)
             }
             db.setTransactionSuccessful()
         } finally {
@@ -384,7 +386,7 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
      * @return List of tags
      */
     fun listTagRecords(): MutableList<Tag> {
-        val tags = arrayListOf<Tag>()
+        var tags = arrayListOf<Tag>()
         val query = "SELECT * FROM $TABLE_TAGS"
         val db = this.readableDatabase
 

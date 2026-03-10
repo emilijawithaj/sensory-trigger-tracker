@@ -12,15 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
-/**
- * Activity for editing the list of saved "confirmed" triggers
- */
 class EditTriggersActivity : AppCompatActivity() {
     val database by lazy { SqLiteDatabase.getInstance(this) }
     private lateinit var activityRootView: View

@@ -4,19 +4,18 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.util.TypedValue.applyDimension
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.soverloadtracker.FrequencyCalcHelper
 import com.example.soverloadtracker.R
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
+import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.dataStorage.LogData
+import com.example.soverloadtracker.dataStorage.Tag
 import com.google.android.material.card.MaterialCardView
 
-/**
- * Fragment for an overview of all the factors and their total occurrences
- */
 class FactorsFragment : Fragment() {
     val database by lazy { SqLiteDatabase.getInstance(requireContext()) }
 

@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.soverloadtracker.dataStorage.LogData
-import com.example.soverloadtracker.dataStorage.SqLiteDatabase
 import kotlinx.coroutines.tasks.await
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
@@ -20,9 +19,6 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import kotlin.lazy
 
-/**
- * Background listener service to handle data exchange with the connected watch
- */
 class WatchListenerService : WearableListenerService() {
     private val database by lazy { SqLiteDatabase.getInstance(this)}
 

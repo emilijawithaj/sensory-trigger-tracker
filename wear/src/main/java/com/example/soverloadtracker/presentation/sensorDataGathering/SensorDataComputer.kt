@@ -1,4 +1,4 @@
-package com.example.soverloadtracker.presentation.sensorDataGathering
+package com.example.soverloadtracker.presentation
 
 import android.util.Log
 import kotlin.math.sqrt

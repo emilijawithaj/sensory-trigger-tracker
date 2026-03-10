@@ -1,8 +1,10 @@
 package com.example.soverloadtracker
 
 import android.content.Context
+import androidx.core.content.ContextCompat.getString
 import com.example.soverloadtracker.dataStorage.LogData
 import com.example.soverloadtracker.dataStorage.Tag
+import kotlin.collections.set
 
 /**
  * Class of static helper functions for log data processing
@@ -170,44 +172,19 @@ class FrequencyCalcHelper {
 
             //calculate percentages
             val total = logs.size
-            val brightLightPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_brightness))
-                    .toDouble() / total * 100).toInt()
-            val strobeLightPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_strobing))
-                    .toDouble() / total * 100).toInt()
-            val lightOtherPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_light_manual))
-                    .toDouble() / total * 100).toInt()
-            val loudSoundPercentage = (factorMap.getValue(context.getString(R.string.factor_loud))
-                .toDouble() / total * 100).toInt()
-            val otherSoundPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_noise_manual))
-                    .toDouble() / total * 100).toInt()
-            val smellStrongPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_smell_strong))
-                    .toDouble() / total * 100).toInt()
-            val smellOtherPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_smell_other))
-                    .toDouble() / total * 100).toInt()
-            val textureTouchPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_touch_texture))
-                    .toDouble() / total * 100).toInt()
-            val personalSpacePercentage =
-                (factorMap.getValue(context.getString(R.string.factor_personal_space))
-                    .toDouble() / total * 100).toInt()
-            val touchOtherPercentage =
-                (factorMap.getValue(context.getString(R.string.factor_touch_other))
-                    .toDouble() / total * 100).toInt()
-            val strongTastePercentage =
-                (factorMap.getValue(context.getString(R.string.factor_taste_strong))
-                    .toDouble() / total * 100).toInt()
-            val badTastePercentage =
-                (factorMap.getValue(context.getString(R.string.factor_taste_bad))
-                    .toDouble() / total * 100).toInt()
-            val otherTastePercentage =
-                (factorMap.getValue(context.getString(R.string.factor_taste_other))
-                    .toDouble() / total * 100).toInt()
+            val brightLightPercentage = (factorMap.getValue(context.getString(R.string.factor_brightness)).toDouble() / total * 100).toInt()
+            val strobeLightPercentage = (factorMap.getValue(context.getString(R.string.factor_strobing)).toDouble() / total * 100).toInt()
+            val lightOtherPercentage = (factorMap.getValue(context.getString(R.string.factor_light_manual)).toDouble() / total * 100).toInt()
+            val loudSoundPercentage = (factorMap.getValue(context.getString(R.string.factor_loud)).toDouble() / total * 100).toInt()
+            val otherSoundPercentage = (factorMap.getValue(context.getString(R.string.factor_noise_manual)).toDouble() / total * 100).toInt()
+            val smellStrongPercentage = (factorMap.getValue(context.getString(R.string.factor_smell_strong)).toDouble() / total * 100).toInt()
+            val smellOtherPercentage = (factorMap.getValue(context.getString(R.string.factor_smell_other)).toDouble() / total * 100).toInt()
+            val textureTouchPercentage = (factorMap.getValue(context.getString(R.string.factor_touch_texture)).toDouble() / total * 100).toInt()
+            val personalSpacePercentage = (factorMap.getValue(context.getString(R.string.factor_personal_space)).toDouble() / total * 100).toInt()
+            val touchOtherPercentage = (factorMap.getValue(context.getString(R.string.factor_touch_other)).toDouble() / total * 100).toInt()
+            val strongTastePercentage = (factorMap.getValue(context.getString(R.string.factor_taste_strong)).toDouble() / total * 100).toInt()
+            val badTastePercentage = (factorMap.getValue(context.getString(R.string.factor_taste_bad)).toDouble() / total * 100).toInt()
+            val otherTastePercentage = (factorMap.getValue(context.getString(R.string.factor_taste_other)).toDouble() / total * 100).toInt()
 
             frequencies[context.getString(R.string.factor_brightness)] = brightLightPercentage
             frequencies[context.getString(R.string.factor_strobing)] = strobeLightPercentage
