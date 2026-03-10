@@ -1,0 +1,175 @@
+/* App logging various environmental factors on button press to track trends in logging environments
+ */
+
+package com.example.soverloadtracker.presentation
+
+import android.Manifest
+import android.R.style
+import android.content.pm.PackageManager
+import android.health.connect.HealthPermissions
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.example.soverloadtracker.presentation.dataStorage.SqLiteDatabase
+import com.example.soverloadtracker.presentation.dataStorage.LogData
+import com.example.soverloadtracker.presentation.screens.AppNavigation
+import com.example.soverloadtracker.presentation.sensorDataGathering.SensorReader
+import com.example.soverloadtracker.presentation.theme.AppTheme
+import java.time.Instant
+
+
+class MainActivity : ComponentActivity() {
+    private val sensorReadManager by lazy {
+        SensorReader(
+            context = this,
+            coroutineScope = lifecycleScope
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
+        setTheme(style.Theme_DeviceDefault)
+        //val userDB = SqLiteDatabase.getInstance(this)
+        //userDB.onUpgrade(userDB.writableDatabase, 1, 1)
+
+        setContent {
+            AppTheme {
+                WearApp({
+                    checkPermissions(
+                        arrayListOf(
+                            HealthPermissions.READ_HEART_RATE,
+                            Manifest.permission.RECORD_AUDIO
+                        )
+                    )
+                }, { createLog(Instant.now()) })
+            }
+        }
+    }
+
+
+    /**
+     * permission launcher to enable getting readings
+     */
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("SOBOOT", "PERMISSION GRANTED START.")
+        } else {
+            Log.e("SOBOOT", "NO PERMISSION too bad")
+        }
+    }
+
+    /**
+     * Launches permission requests for any permissions which are not already granted
+     * @param permission list of permissions to request
+     */
+    fun checkPermissions(permission: ArrayList<String>) {
+        for (p in permission) {
+            when {
+                //Already granted, launch reading
+                ContextCompat.checkSelfPermission(
+                    this,
+                    p
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    Log.d("SOBOOT", "Permission is already granted.")
+                }
+
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, p
+                ) -> {
+                    Log.d("SOBOOT", "In rationale.")
+                    permissionLauncher.launch(p)
+                }
+
+                //Ask
+                else -> {
+                    Log.d("SOBOOT", "Requesting permission.")
+                    permissionLauncher.launch(p)
+                }
+            }
+        }
+        sensorReadManager.startHeartRateStreaming()
+        sensorReadManager.takeLightReading()
+        sensorReadManager.takeSoundReading()
+    }
+
+    /**
+     * Create a new log, leaving all manual triggers empty
+     * @param datetime time to log as Instant
+     * @return the log as a LogData object
+     */
+    fun createLog(datetime: Instant): LogData {
+        val avgLux = sensorReadManager.lightReads.average().toFloat()
+        val luxStdev = sensorReadManager.dataProcessor.lightStdev
+        val lightOther = false //
+        val avgDecibels = sensorReadManager.soundReadings.average().toFloat()
+        val noiseOther = false //
+        val smellStrong = false //
+        val smellOther = false //
+        val tactileBad = false //
+        val tactilePersonalContact = false //
+        val tactileOther = false //
+        val tasteStrong = false //
+        val tasteBad = false //
+        val tasteOther = false //
+        val tags = arrayListOf<String>()
+
+        val logData = LogData(
+            datetime,
+            avgLux,
+            luxStdev,
+            lightOther,
+            avgDecibels,
+            noiseOther,
+            smellStrong,
+            smellOther,
+            tactileBad,
+            tactilePersonalContact,
+            tactileOther,
+            tasteStrong,
+            tasteBad,
+            tasteOther,
+            tags
+        )
+
+        return logData
+    }
+}
+
+/**
+ * App
+ */
+@Composable
+fun WearApp(goToPermissions: () -> Unit, createLog: (Instant) -> LogData) {
+    //SETUP
+    val navController = rememberSwipeDismissableNavController()
+    var activeLog by remember { mutableStateOf<LogData?>(null) }
+    val context = LocalContext.current
+    val database = remember { SqLiteDatabase.getInstance(context) }
+
+    AppNavigation(
+        navController = navController,
+        activeLog = activeLog,
+        database = database,
+        goToPermissions = goToPermissions,
+        createLog = createLog
+    )
+}
