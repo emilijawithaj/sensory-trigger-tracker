@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">SOverloadTracker</string>
+
+    <!-- MainActivity -->
+    <string name="home_title">Your Data:</string>
+    <string name="set_triggers_title">Your triggers:</string>
+    <string name="common_factors_title">Most commonly appearing factors in your logs:</string>
+    <string name="sync_button">SYNC WITH WATCH</string>
+    <string name="detailed_page_button">FURTHER DETAILS</string>
+    <string name="factor_name">%1$s</string>
+    <string name="common_factors_frequency">Present in %1$d%% of logs</string>
+    <string name="no_of_logs_title">Total Logs</string>
+    <string name="no_of_logs">%1$d</string>
+    <string name="last_sync_title">Last Sync</string>
+    <string name="last_sync">$1$s %2$s</string>
+    <string name="edit_triggers">Edit</string>
+    <string name="no_triggers_text">No triggers identified yet</string>
+
+    <!-- EditTriggersActivity -->
+    <string name="add_button">Add New</string>
+    <string name="trigger_dialog_title">Describe your trigger:</string>
+    <string name="add_trigger_text_hint">e.g. Strobing Lights</string>
+    <string name="dialog_ok_text">Add</string>
+    <string name="edit_triggers_title">My Triggers</string>
+    <string name="remove_triggers_title">Remove Triggers</string>
+    <string name="suggested_triggers_title">Suggested Triggers</string>
+    <string name="no_suggestions_text">Nothing to suggest yet</string>
+
+    <!-- Factors page -->
+    <string name="factor_brightness">Bright Light</string>
+    <string name="factor_strobing">Strobing Light</string>
+    <string name="factor_light_manual">Light (other)</string>
+    <string name="factor_loud">Loud Background Noise</string>
+    <string name="factor_noise_manual">Noise (other)</string>
+    <string name="factor_smell_strong">Strong Smell</string>
+    <string name="factor_smell_other">Smell (other)</string>
+    <string name="factor_touch_texture">Touch (Bad Texture)</string>
+    <string name="factor_personal_space">Lack of Personal Space</string>
+    <string name="factor_touch_other">Touch (other)</string>
+    <string name="factor_taste_strong">Strong Taste</string>
+    <string name="factor_taste_bad">Bad Taste</string>
+    <string name="factor_taste_other">Taste (other)</string>
+    <string name="tags_frequency">Present in %1$d logs</string>
+
+    <!-- log history & edit log pages -->
+    <string name="log_no_factors">no factors logged</string>
+    <string name="edit_factors_title">Edit Factors</string>
+    <string name="edit_log_title">Log at: %1$s</string>
+    <string name="tags_title">Tags</string>
+    <string name="add_new_tag_button">Add New Tag</string>
+    <string name="no_tags_to_show">no tags to show</string>
+    <string name="save_log_button">Save Changes</string>
+    <string name="add_tag_dialog_title">Tag to Add:</string>
+    <string name="add_tag_prompt">e.g. Fatigue</string>
+    <string name="delete_log_button">Delete Log</string>
+
+    <!-- Details page -->
+    <string-array name="tabTitles">
+        <item>Factors</item>
+        <item>Logs</item>
+    </string-array>
+
+</resources>

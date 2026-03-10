@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">SOverloadTracker</string>
+    <string name="complication_label">Example complication</string>
+    <string name="title_label">Sensory Overload Tracker</string>
+
+
+    <!-- log page -->
+    <string name="loading_text">Gathering Sensor Data…</string>
+
+
+    <!-- factors prompt -->
+    <string name="factors_button_text">Factors</string>
+    <string name="skip_button_text">SKIP</string>
+
+    <!-- factors menu -->
+    <string name="next_button">Next</string>
+
+    <!-- log page -->
+    <string name="log_button">LOG</string>
+    <string name="light_category">Light</string>
+    <string name="sound_category">Sound</string>
+    <string name="smell_category">Smell</string>
+    <string name="touch_category">Touch</string>
+    <string name="taste_category">Taste</string>
+
+    <!-- factor category pages -->
+    <string name="touch_menu_title">Touch Factors</string>
+    <string name="texture_toggle">Texture</string>
+    <string name="personal_space_toggle">Personal Space</string>
+    <string name="other_toggle">Other</string>
+    <string name="smell_strong_toggle">Smell Too Strong</string>
+    <string name="smell_other_trigger">Other Smell Factor</string>
+    <string name="smell_factors_title">Smell Factors</string>
+    <string name="taste_factors_title">Taste Factors</string>
+    <string name="strong_taste_toggle">Strong Taste</string>
+    <string name="unpleasant_taste_title">Unpleasant Taste</string>
+    <string name="light_factors_title">Light Factors</string>
+    <string name="bright_light_toggle">Bright Light</string>
+    <string name="strobing_light_toggle">Strobing Light</string>
+    <string name="sound_factors_title">Noise Factors</string>
+    <string name="loud_sound_toggle">Loud Sounds</string>
+
+    <!-- tags page -->
+    <string name="tags_page_title">Add Tags</string>
+    <string name="tag_prompt">Tag name…</string>
+    <string name="add_tag_button">Add Tag</string>
+
+    <!-- settings -->
+    <string name="settings_button">Settings</string>
+    <string name="background_tracking_setting">Background tracking</string>
+    <string name="background_tracking_explanation">Constantly track Heart Rate and sensor data and suggest potentially triggering environments by flagging when Heart Rate is high and a tracked factor is identified.</string>
+    <string name="automatic_factor_tracking">Automatic Factor Tracking</string>
+    <string name="automatic_factors_description">Automatically select which factors to track based on historic prevalence.</string>
+    <string name="manual_tracking_selection">Manual tracking selection:</string>
+    <string name="bright_lights">Bright Lights</string>
+    <string name="strobing_lights">Strobing Lights</string>
+    <string name="loud_background_noise">Loud Background Noise</string>
+
+</resources>
