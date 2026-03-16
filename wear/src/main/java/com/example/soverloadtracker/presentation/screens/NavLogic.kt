@@ -162,7 +162,7 @@ fun AppNavigation(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         val manager = SettingsManager(context)
-                        return SettingsViewModel(manager) as T
+                        return SettingsViewModel(manager, context.applicationContext) as T
                     }
                 }
             )

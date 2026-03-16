@@ -73,4 +73,6 @@ dependencies {
     implementation(libs.androidx.health.services.client)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation( libs.androidx.datastore.preferences)
+    implementation(libs.guava)
+    implementation(libs.androidx.concurrent.futures.ktx)
 }
