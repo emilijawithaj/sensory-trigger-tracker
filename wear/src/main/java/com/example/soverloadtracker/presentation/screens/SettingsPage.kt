@@ -4,10 +4,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,16 +15,17 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
+import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
 
 @Composable
-fun SettingsPage() {
-    // In a real app, collect this state from a ViewModel/DataStore
-    var isBackgroundTrackingEnabled by remember { mutableStateOf(false) }
-    var isAutoTriggersEnabled by remember { mutableStateOf(false) }
+fun SettingsPage(viewModel: SettingsViewModel) {
+    // Collect the state from the ViewModel
+    val isBackgroundTrackingEnabled by viewModel.isBackgroundTrackingEnabled.collectAsState()
+    val isAutoTriggersEnabled by viewModel.isAutoTriggersEnabled.collectAsState()
+    val isBrightLightEnabled by viewModel.isBrightLightEnabled.collectAsState()
+    val isStrobingLightEnabled by viewModel.isStrobingLightEnabled.collectAsState()
+    val isLoudSoundEnabled by viewModel.isLoudSoundEnabled.collectAsState()
 
-    var brightLightTracking by remember { mutableStateOf(false) }
-    var strobingLightTracking by remember { mutableStateOf(false) }
-    var loudSoundTracking by remember { mutableStateOf(false) }
 
     ScalingLazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -44,7 +43,7 @@ fun SettingsPage() {
         item {
             SwitchButton(
                 checked = isBackgroundTrackingEnabled,
-                onCheckedChange = { isBackgroundTrackingEnabled = it },
+                onCheckedChange = { viewModel.toggleBackgroundTracking(it) },
                 label = {
                     Text(stringResource(R.string.background_tracking_setting))
                 },
@@ -59,7 +58,7 @@ fun SettingsPage() {
         item {
             SwitchButton(
                 checked = isAutoTriggersEnabled,
-                onCheckedChange = { isAutoTriggersEnabled = it },
+                onCheckedChange = { viewModel.toggleAutoTriggers(it) },
                 label = {
                     Text(stringResource(R.string.automatic_factor_tracking))
                 },
@@ -84,8 +83,8 @@ fun SettingsPage() {
 
         item {
             SwitchButton(
-                checked = brightLightTracking,
-                onCheckedChange = { brightLightTracking = it },
+                checked = isBrightLightEnabled,
+                onCheckedChange = { viewModel.toggleBrightLight(it) },
                 label = {
                     Text(stringResource(R.string.bright_lights))
                 },
@@ -94,8 +93,8 @@ fun SettingsPage() {
         }
         item {
             SwitchButton(
-                checked = strobingLightTracking,
-                onCheckedChange = { strobingLightTracking = it },
+                checked = isStrobingLightEnabled,
+                onCheckedChange = { viewModel.toggleStrobingLight(it) },
                 label = {
                     Text(stringResource(R.string.strobing_lights))
                 },
@@ -104,8 +103,8 @@ fun SettingsPage() {
         }
         item {
             SwitchButton(
-                checked = loudSoundTracking,
-                onCheckedChange = { loudSoundTracking = it },
+                checked = isLoudSoundEnabled,
+                onCheckedChange = { viewModel.toggleLoudSound(it) },
                 label = {
                     Text(stringResource(R.string.loud_background_noise))
                 },
