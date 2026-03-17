@@ -23,10 +23,6 @@
         <service
             android:name=".presentation.sensorDataGathering.BackgroundHeartRateService"
             android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_HEALTH_SERVICES" />
-        <service
-            android:name=".presentation.sensorDataGathering.BackgroundHeartRateService"
-            android:exported="true"
             android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING" />
 
         <service
