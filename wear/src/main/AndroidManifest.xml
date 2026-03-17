@@ -22,9 +22,12 @@
         android:theme="@android:style/Theme.DeviceDefault">
         <service
             android:name=".presentation.sensorDataGathering.BackgroundHeartRateService"
-            android:exported="true"
-            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING" />
-
+            android:permission="com.google.android.gms.permission.BIND_HEALTH_SERVICES"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.health.services.client.PassiveListenerService" />
+            </intent-filter>
+        </service>
         <service
             android:name=".complication.MainComplicationService"
             android:exported="true"
