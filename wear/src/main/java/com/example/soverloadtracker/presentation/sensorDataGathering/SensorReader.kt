@@ -1,4 +1,4 @@
-package com.example.soverloadtracker.presentation
+package com.example.soverloadtracker.presentation.sensorDataGathering
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,7 +6,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaRecorder
-import android.os.Build
 import android.util.Log
 import androidx.health.services.client.ExerciseUpdateCallback
 import androidx.health.services.client.HealthServices
@@ -29,7 +28,7 @@ import kotlin.math.log10
 class SensorReader(private val context: Context,
                    private val coroutineScope: CoroutineScope) {
     val dataProcessor = SensorDataComputer()
-    private val delayTime = 3000L;
+    private val delayTime = 3000L
     // HR reading
     private val healthServicesClient by lazy { HealthServices.getClient(context) }
     private val exerciseClient by lazy { healthServicesClient.exerciseClient }
