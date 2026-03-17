@@ -1,4 +1,4 @@
-package com.example.soverloadtracker.presentation
+package com.example.soverloadtracker.presentation.sensorDataGathering
 
 import android.util.Log
 import kotlin.math.sqrt
@@ -11,10 +11,13 @@ class SensorDataComputer {
     var lightStdev: Float? = null
 
     //toggles
-    val highLightLevel = 150f
-    val lightSmpleSizeMin = 4
-    val strobingSTDevThresh = 40
-    val dbThreshold = 80
+    companion object {
+        const val HIGH_LIGHT_LEVEL = 150f
+        const val LIGHT_SAMPLE_MIN = 4
+        const val STROBING_STDEV_THRESHOLD = 40
+        const val DECIBEL_THRESHOLD = 80
+        const val HIGH_HR_THRESHOLD = 50
+    }
 
     /**
      * Guess whether the user in a strobing light environment based on the
@@ -24,7 +27,7 @@ class SensorDataComputer {
      */
     fun isLightStrobing(): Boolean {
         //assume false for small sample sizes
-        if (lightReads.size < lightSmpleSizeMin) {
+        if (lightReads.size < LIGHT_SAMPLE_MIN) {
             Log.d("LOGPROCESS", "Strobing too low sample size.")
             return false
         }
@@ -39,7 +42,7 @@ class SensorDataComputer {
         val stdev = sqrt(variance)
         lightStdev = stdev.toFloat()
 
-        if (stdev >= strobingSTDevThresh) {
+        if (stdev >= STROBING_STDEV_THRESHOLD) {
             Log.d("LOGPROCESS", "Is strobing. Stdev: $stdev")
             return true
         }
@@ -54,13 +57,13 @@ class SensorDataComputer {
      * @return If lights likely to be bright
      */
     fun isLightBright(): Boolean {
-        if (lightReads.average() > highLightLevel) {
+        if (lightReads.average() > HIGH_LIGHT_LEVEL) {
             Log.d("LOGPROCESS", "High light.")
             return true
         }
         else if(isLightStrobing()) {
             lightReads.removeIf { it < lightReads.average() }
-            if (lightReads.average() > highLightLevel) {
+            if (lightReads.average() > HIGH_LIGHT_LEVEL) {
                 Log.d("LOGPROCESS", "High light.")
                 return true
             }
@@ -72,7 +75,7 @@ class SensorDataComputer {
     fun isLoudSound(): Boolean {
         val mean = soundReadings.average()
         Log.d("LOGPROCESS", "$mean dB.")
-        if (mean > dbThreshold) {
+        if (mean > DECIBEL_THRESHOLD) {
             Log.d("LOGPROCESS", "Loud sound.")
             return true
         }

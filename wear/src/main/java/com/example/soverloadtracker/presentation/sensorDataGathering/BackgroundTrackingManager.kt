@@ -1,6 +1,7 @@
 package com.example.soverloadtracker.presentation.sensorDataGathering
 
 import android.content.Context
+import android.util.Log
 import androidx.concurrent.futures.await
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.data.DataType
@@ -22,6 +23,7 @@ class BackgroundTrackingManager(context: Context) {
             BackgroundHeartRateService::class.java,
             passiveListenerConfig
         ).await()
+        Log.d("HRateBG", "Background Tracking Started")
     }
 
     /**

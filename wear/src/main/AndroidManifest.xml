@@ -3,6 +3,7 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -10,6 +11,9 @@
     <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
     <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND" />
+
 
     <queries>
         <package android:name="com.google.android.wearable.healthservices" />
@@ -22,13 +26,9 @@
         android:theme="@android:style/Theme.DeviceDefault">
         <service
             android:name=".presentation.sensorDataGathering.BackgroundHeartRateService"
-            android:exported="true"
-            android:permission="com.google.android.gms.permission.BIND_HEALTH_SERVICES" />
-        <service
-            android:name=".presentation.sensorDataGathering.BackgroundHeartRateService"
-            android:exported="true"
-            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING" />
-
+            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
+            android:exported="true">
+        </service>
         <service
             android:name=".complication.MainComplicationService"
             android:exported="true"

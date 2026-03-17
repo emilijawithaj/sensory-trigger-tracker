@@ -14,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.screens.AppNavigation
+import com.example.soverloadtracker.presentation.sensorDataGathering.SensorReader
 import com.example.soverloadtracker.presentation.theme.AppTheme
 import java.time.Instant
 
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 13)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -53,7 +56,11 @@ class MainActivity : ComponentActivity() {
                     checkPermissions(
                         arrayListOf(
                             HealthPermissions.READ_HEART_RATE,
-                            Manifest.permission.RECORD_AUDIO
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.BODY_SENSORS_BACKGROUND,
+                            Manifest.permission.BODY_SENSORS,
+                            Manifest.permission.POST_NOTIFICATIONS,
+                            HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND
                         )
                     )
                 }, { createLog(Instant.now()) })
