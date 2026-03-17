@@ -9,13 +9,18 @@ import androidx.core.app.NotificationCompat
 import androidx.health.services.client.PassiveListenerService
 import androidx.health.services.client.data.DataPointContainer
 import androidx.health.services.client.data.DataType
+import com.example.soverloadtracker.R
 import com.example.soverloadtracker.presentation.dataStorage.SettingsManager
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 class BackgroundHeartRateService : PassiveListenerService() {
 
+    /**
+     * Handle new data points received from the sensors
+     */
     override fun onNewDataPointsReceived(dataPoints: DataPointContainer) {
         val hrPoints = dataPoints.getData(DataType.HEART_RATE_BPM)
 
@@ -27,8 +32,9 @@ class BackgroundHeartRateService : PassiveListenerService() {
             context = this,
             coroutineScope = serviceScope
         )
-        runBlocking { sensorReadManager.takeLightReading() }
-        runBlocking { sensorReadManager.takeSoundReading() }
+        sensorReadManager.takeLightReading()
+        sensorReadManager.takeSoundReading()
+        runBlocking { delay(3500L) }
 
         //get settings values
         val autoTriggerEnabled = runBlocking { settingsManager.autoTriggersFlow.first() }
@@ -36,54 +42,42 @@ class BackgroundHeartRateService : PassiveListenerService() {
         val checkingForStrobing = runBlocking { settingsManager.brightLightFlow.first() }
         val checkingForLoud = runBlocking { settingsManager.loudSoundFlow.first() }
 
+        //flags
+        var bpmHighEnough = false
+
         //deal with points
-        for (point in hrPoints) {
-            val bpm = point.value
-            Log.d("HRateBG", "Background BPM: $bpm")
+        while (!bpmHighEnough) {
+            for (point in hrPoints) {
+                val bpm = point.value
+                Log.d("HRateBG", "Background BPM: $bpm")
 
-            val highHRthreshold = SensorDataComputer.HIGH_HR_THRESHOLD
+                val highHRthreshold = SensorDataComputer.HIGH_HR_THRESHOLD
 
-            if (bpm > highHRthreshold) {
-                //compare values
-                if (checkingForBright) {
-                    if (sensorReadManager.dataProcessor.isLightBright()) {
-                        sendAlert(
-                            "Potential Overload Alert!",
-                            "High HR detected in bright environment"
-                        )
-                    }
-                }
-
-
-
-                if (checkingForStrobing) {
-                    if (sensorReadManager.dataProcessor.isLightStrobing()) {
-                        sendAlert(
-                            "Potential Overload Alert!",
-                            "High HR detected with strobing light present"
-                        )
-
-                    }
-                }
-
-                if (checkingForLoud) {
-                    if (sensorReadManager.dataProcessor.isLoudSound()) {
-                        sendAlert(
-                            "Potential Overload Alert!",
-                            "High HR detected in loud environment"
-                        )
-                    }
+                if (bpm > highHRthreshold) {
+                    bpmHighEnough = true
                 }
             }
+        }
+
+        //compare values
+        if (checkingForBright && sensorReadManager.dataProcessor.isLightBright()) {
+            sendAlert(getString(R.string.high_hr_detected_with_bright_light_present))
+        }
+
+        if (checkingForStrobing && sensorReadManager.dataProcessor.isLightStrobing()) {
+            sendAlert(getString(R.string.high_hr_detected_with_strobing_light_present))
+        }
+
+        if (checkingForLoud && sensorReadManager.dataProcessor.isLoudSound()) {
+            sendAlert(getString(R.string.high_hr_detected_in_loud_environment))
         }
     }
 
     /**
      * Builds and triggers a notification sent to the user, including a vibration.
-     * @param title Title of the notification
      * @param message Message of the notification
      */
-    private fun sendAlert(title: String, message: String) {
+    private fun sendAlert(message: String) {
         val context = applicationContext
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "soverload_alerts"
@@ -94,14 +88,14 @@ class BackgroundHeartRateService : PassiveListenerService() {
             "SOverload Alerts",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "Alerts for possible sensory overload occurrences."
+            description = getString(R.string.HR_service_alerts_description)
         }
         notificationManager.createNotificationChannel(channel)
 
         // construct notification
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle(title)
+            .setContentTitle(getString(R.string.potential_overload_alert))
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
@@ -115,8 +109,7 @@ class BackgroundHeartRateService : PassiveListenerService() {
         vibrator.vibrate(vibrationEffect)
 
         // Show Notification
-        // Use a unique ID based on the title hash so multiple alerts can show at once
-        notificationManager.notify(title.hashCode(), notification)
+        notificationManager.notify(getString(R.string.potential_overload_alert).hashCode(), notification)
     }
 
 

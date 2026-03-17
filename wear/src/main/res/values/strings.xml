@@ -55,5 +55,10 @@
     <string name="bright_lights">Bright Lights</string>
     <string name="strobing_lights">Strobing Lights</string>
     <string name="loud_background_noise">Loud Background Noise</string>
+    <string name="HR_service_alerts_description">Alerts for possible sensory overload occurrences.</string>
+    <string name="potential_overload_alert">Potential Overload Alert!</string>
+    <string name="high_hr_detected_with_bright_light_present">High HR detected with bright light present</string>
+    <string name="high_hr_detected_with_strobing_light_present">High HR detected with strobing light present</string>
+    <string name="high_hr_detected_in_loud_environment">High HR detected in loud environment</string>
 
 </resources>
