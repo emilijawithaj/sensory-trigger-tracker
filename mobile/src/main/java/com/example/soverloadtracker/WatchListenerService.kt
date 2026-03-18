@@ -8,19 +8,37 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.soverloadtracker.dataStorage.LogData
-import kotlinx.coroutines.tasks.await
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.Instant
-import kotlin.lazy
 
 class WatchListenerService : WearableListenerService() {
     private val database by lazy { SqLiteDatabase.getInstance(this)}
+
+    /**
+     * Handles incoming messages from the watch
+     */
+    override fun onMessageReceived(messageEvent: MessageEvent) {
+        Log.d(TAG, "onMessageReceived(): $messageEvent")
+        Log.d(TAG, String(messageEvent.data))
+
+        //handle start and finish
+        if (messageEvent.path == "/autoTracking") {
+            val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+
+            prefs.edit().apply {
+                putBoolean("autoTracking", String(messageEvent.data) == "true")
+                apply()
+            }
+        }
+    }
 
     /**
      * Handles incoming database logs from the watch
@@ -105,6 +123,34 @@ class WatchListenerService : WearableListenerService() {
             }
         }
 
+        /**
+         * Updates the settings for what should be tracked in the automatic factor selection
+         * for background tracking/alert system
+         */
+        fun sendSettingsUpdate(context: Context, brightLight: Boolean, strobeLight: Boolean, loudSound: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val nodeClient = Wearable.getNodeClient(context)
+                    val messageClient = Wearable.getMessageClient(context)
+                    val nodes = nodeClient.connectedNodes.await()
+
+                    val payload = "$brightLight,$strobeLight,$loudSound".toByteArray(Charsets.UTF_8)
+
+                    for (node in nodes) {
+                        messageClient.sendMessage(node.id, "/tracking", payload).await()
+                        Log.d(TAG, "Synced tracking factors to node: ${node.displayName}")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error sending settings update request", e)
+                }
+            }
+        }
+
+
+        /**
+         * Sends request to delete a log from the connected watch by its dateTime ID
+         * @param dateTime ID of the log to be deleted
+         */
         fun sendDeleteRequest(context: Context, dateTime: String) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {

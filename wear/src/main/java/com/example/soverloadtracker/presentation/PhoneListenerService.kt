@@ -4,8 +4,10 @@
 package com.example.soverloadtracker.presentation
 
 
+import android.content.Context
 import android.util.Log
 import com.example.soverloadtracker.SqLiteDatabase
+import com.example.soverloadtracker.presentation.dataStorage.SettingsManager
 import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -38,7 +40,21 @@ class PhoneListenerService : WearableListenerService() {
             database.deleteLog(dateTime)
             Log.d(TAG, "Deleted log with dateTime: $dateTime")
         }
+
+        //handle tracking settings updates
+        if (messageEvent.path == "/tracking") {
+            val settings = String(messageEvent.data, Charsets.UTF_8).split(",")
+
+            serviceScope.launch {
+                val settingsManager = SettingsManager(applicationContext)
+                settingsManager.updateSetting(SettingsManager.BRIGHT_LIGHT, settings[0].toBoolean())
+                settingsManager.updateSetting(SettingsManager.STROBING_LIGHT, settings[1].toBoolean())
+                settingsManager.updateSetting(SettingsManager.LOUD_SOUND, settings[2].toBoolean())
+                Log.d(TAG, "Updated tracking settings: $settings")
+            }
+        }
     }
+
 
     /**
      * Send all logs in the database as DataItems to the phone
@@ -79,7 +95,6 @@ class PhoneListenerService : WearableListenerService() {
                 //send
                 val putDataMapRequest = PutDataMapRequest.create("/syncLogs").apply {
                     dataMap.putDataMapArrayList("logList", logDataMapList)
-                    // Add a timestamp to ensure the data item is always updated*TODO
                     dataMap.putLong("timestamp", System.currentTimeMillis())
                 }
 
@@ -101,5 +116,30 @@ class PhoneListenerService : WearableListenerService() {
 
     companion object {
         private const val TAG = "ListenerServiceOnWatch"
+
+        /**
+         * Sets the setting for autotracking on the phone
+         * @param autoTrackingEnabled State of auto tracking
+         */
+        fun updatePhoneOnAutoTracker(context: Context, autoTrackingEnabled: Boolean) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val nodeClient = Wearable.getNodeClient(context)
+                    val messageClient = Wearable.getMessageClient(context)
+                    val nodes = nodeClient.connectedNodes.await()
+
+                    for (node in nodes) {
+                        messageClient.sendMessage(
+                            node.id,
+                            "/autoTracking",
+                            autoTrackingEnabled.toString().toByteArray()
+                        ).await()
+                        Log.d(TAG, "Sent tracking update to node: ${node.displayName}")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error sending sync request.", e)
+                }
+            }
+        }
     }
 }

@@ -15,6 +15,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
+import com.example.soverloadtracker.presentation.PhoneListenerService
 import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
 
 @Composable
@@ -58,7 +59,10 @@ fun SettingsPage(viewModel: SettingsViewModel) {
         item {
             SwitchButton(
                 checked = isAutoTriggersEnabled,
-                onCheckedChange = { viewModel.toggleAutoTriggers(it) },
+                onCheckedChange = {
+                    viewModel.toggleAutoTriggers(it)
+                    PhoneListenerService.updatePhoneOnAutoTracker(viewModel.appContext, it)
+                },
                 label = {
                     Text(stringResource(R.string.automatic_factor_tracking))
                 },
