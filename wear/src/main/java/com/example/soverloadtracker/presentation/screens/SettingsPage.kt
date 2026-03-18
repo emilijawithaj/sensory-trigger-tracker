@@ -71,6 +71,7 @@ fun SettingsPage(viewModel: SettingsViewModel) {
                         stringResource(R.string.automatic_factors_description)
                     )
                 },
+                enabled = isBackgroundTrackingEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -92,6 +93,7 @@ fun SettingsPage(viewModel: SettingsViewModel) {
                 label = {
                     Text(stringResource(R.string.bright_lights))
                 },
+                enabled = !isAutoTriggersEnabled && isBackgroundTrackingEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -102,6 +104,7 @@ fun SettingsPage(viewModel: SettingsViewModel) {
                 label = {
                     Text(stringResource(R.string.strobing_lights))
                 },
+                enabled = !isAutoTriggersEnabled && isBackgroundTrackingEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -112,6 +115,7 @@ fun SettingsPage(viewModel: SettingsViewModel) {
                 label = {
                     Text(stringResource(R.string.loud_background_noise))
                 },
+                enabled = !isAutoTriggersEnabled && isBackgroundTrackingEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
         }
