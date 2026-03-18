@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.soverloadtracker.WatchListenerService.Companion.sendSettingsUpdate
 import com.example.soverloadtracker.detailsViews.DetailsActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
@@ -42,6 +43,11 @@ class MainActivity : AppCompatActivity() {
             IntentFilter("com.example.soverloadtracker.SYNC_COMPLETE"),
             RECEIVER_NOT_EXPORTED
         )
+
+        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+        if (prefs.getBoolean("autoTracking", true)) {
+            autoSettingsSet()
+        }
     }
 
     override fun onStop() {
@@ -256,6 +262,45 @@ class MainActivity : AppCompatActivity() {
         }
 
         return commonFactors
+    }
+
+    /**
+     * Checks for factors to be autotracked and triggers a sending of them to the watch
+     */
+    fun autoSettingsSet() {
+        val highFrequencyThreshold = 60
+
+        val triggerList = database.getTriggers()
+        val allLogs = database.listLogRecords()
+        val frequencyMap = FrequencyCalcHelper.calculateFactorPercentages(this, allLogs)
+
+        var brightLight = false
+        var strobeLight = false
+        var loudSound = false
+
+        //check trigger db
+        if (triggerList.contains(getString(R.string.factor_brightness))) {
+            brightLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_strobing))) {
+            strobeLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_loud))) {
+            loudSound = true
+        }
+
+        //check by frequency
+        if (frequencyMap[getString(R.string.factor_brightness)]!! > highFrequencyThreshold) {
+            brightLight = true
+        }
+        if (frequencyMap[getString(R.string.factor_strobing)]!! > highFrequencyThreshold) {
+            strobeLight = true
+        }
+        if (frequencyMap[getString(R.string.factor_loud)]!! > highFrequencyThreshold) {
+            loudSound = true
+        }
+
+        sendSettingsUpdate(this, brightLight, strobeLight, loudSound)
     }
 
 }

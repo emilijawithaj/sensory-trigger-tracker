@@ -29,7 +29,7 @@ class WatchListenerService : WearableListenerService() {
         Log.d(TAG, "onMessageReceived(): $messageEvent")
         Log.d(TAG, String(messageEvent.data))
 
-        //handle start and finish
+        //handle automatic factor background tracking being turned on or off
         if (messageEvent.path == "/autoTracking") {
             val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
 
@@ -37,7 +37,51 @@ class WatchListenerService : WearableListenerService() {
                 putBoolean("autoTracking", String(messageEvent.data) == "true")
                 apply()
             }
+
+            //do initial set
+            if (prefs.getBoolean("autoTracking", true)) {
+                autoSettingsSet()
+            }
         }
+    }
+
+    /**
+     * Checks for factors to be autotracked and triggers a sending of them to the watch
+     */
+    fun autoSettingsSet() {
+        val highFrequencyThreshold = 60
+
+        val triggerList = database.getTriggers()
+        val allLogs = database.listLogRecords()
+        val frequencyMap = FrequencyCalcHelper.calculateFactorPercentages(this, allLogs)
+
+        var brightLight = false
+        var strobeLight = false
+        var loudSound = false
+
+        //check trigger db
+        if (triggerList.contains(getString(R.string.factor_brightness))) {
+            brightLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_strobing))) {
+            strobeLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_loud))) {
+            loudSound = true
+        }
+
+        //check by frequency
+        if (frequencyMap[getString(R.string.factor_brightness)]!! > highFrequencyThreshold) {
+            brightLight = true
+        }
+        if (frequencyMap[getString(R.string.factor_strobing)]!! > highFrequencyThreshold) {
+            strobeLight = true
+        }
+        if (frequencyMap[getString(R.string.factor_loud)]!! > highFrequencyThreshold) {
+            loudSound = true
+        }
+
+        sendSettingsUpdate(this, brightLight, strobeLight, loudSound)
     }
 
     /**
