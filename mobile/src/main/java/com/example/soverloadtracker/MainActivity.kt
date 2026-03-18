@@ -43,11 +43,6 @@ class MainActivity : AppCompatActivity() {
             IntentFilter("com.example.soverloadtracker.SYNC_COMPLETE"),
             RECEIVER_NOT_EXPORTED
         )
-
-        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
-        if (prefs.getBoolean("autoTracking", true)) {
-            autoSettingsSet()
-        }
     }
 
     override fun onStop() {
@@ -91,6 +86,12 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         refreshUI()
+
+        //update settings if necessary
+        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+        if (prefs.getBoolean("autoTracking", true)) {
+            autoSettingsSet()
+        }
     }
 
     /**
