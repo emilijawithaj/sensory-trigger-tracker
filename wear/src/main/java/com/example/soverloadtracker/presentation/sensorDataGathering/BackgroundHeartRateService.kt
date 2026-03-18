@@ -74,6 +74,13 @@ class BackgroundHeartRateService : PassiveListenerService() {
     }
 
     /**
+     * Identify factors to be caught based on frequency of occurrences
+     */
+    private fun extractFactorsForAutoTracking() {
+
+    }
+
+    /**
      * Builds and triggers a notification sent to the user, including a vibration.
      * @param message Message of the notification
      */
