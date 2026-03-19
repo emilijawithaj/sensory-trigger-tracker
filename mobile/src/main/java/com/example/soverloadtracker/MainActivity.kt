@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.soverloadtracker.WatchListenerService.Companion.sendSettingsUpdate
 import com.example.soverloadtracker.detailsViews.DetailsActivity
+import com.example.soverloadtracker.detailsViews.EditLogActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -32,6 +33,20 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             refreshUI()
             Snackbar.make(findViewById(R.id.main), "Data Synced", Snackbar.LENGTH_SHORT).show()
+
+            //launch edit after mark end
+            val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+            if (prefs.getBoolean("launchingEdit", false)) {
+                prefs.edit().apply {
+                    putBoolean("launchingEdit", false)
+                    apply()
+                }
+
+                val mostRecentLog = database.listLogRecords().maxByOrNull { it.dateTime }
+                val intent = Intent(context, EditLogActivity::class.java)
+                intent.putExtra("LOG_TIMESTAMP", mostRecentLog?.dateTime.toString())
+                startActivity(intent)
+            }
         }
     }
 
@@ -49,6 +64,25 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         unregisterReceiver(syncReceiver)
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        //handle watch triggers
+        val watchMessage = intent.getBooleanExtra("markEnd", false)
+        val context = this
+        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+
+        if (watchMessage) {
+            WatchListenerService.sendSyncRequest(context)
+
+            prefs.edit().apply {
+                putBoolean("launchingEdit", true)
+                apply()
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

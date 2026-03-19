@@ -43,6 +43,15 @@ class WatchListenerService : WearableListenerService() {
                 autoSettingsSet()
             }
         }
+
+        //handle edit launch on mark end
+        if (messageEvent.path == "/markEnd") {
+            val startIntent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra("markEnd", true)
+            }
+            startActivity(startIntent)
+        }
     }
 
     /**

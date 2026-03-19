@@ -141,5 +141,26 @@ class PhoneListenerService : WearableListenerService() {
                 }
             }
         }
+
+
+        fun sendMarkEnd(context: Context) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val nodeClient = Wearable.getNodeClient(context)
+                    val messageClient = Wearable.getMessageClient(context)
+                    val nodes = nodeClient.connectedNodes.await()
+
+                    for (node in nodes) {
+                        messageClient.sendMessage(
+                            node.id,
+                            "/markEnd",
+                            "true".toByteArray()
+                        ).await()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error sending mark end message.", e)
+                }
+            }
+        }
     }
 }
