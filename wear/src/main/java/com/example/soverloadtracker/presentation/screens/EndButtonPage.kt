@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TextButton
+import com.example.soverloadtracker.presentation.PhoneListenerService
 
 
 /**
@@ -15,8 +17,11 @@ import androidx.wear.compose.material3.TextButton
  */
 @Composable
 fun EndButton(nextButtonOnClick: () -> Unit) {
+    val context = LocalContext.current
+
     TextButton(
         onClick = {
+            PhoneListenerService.sendMarkEnd(context)
             nextButtonOnClick()
         },
         modifier = Modifier

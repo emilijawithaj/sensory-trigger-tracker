@@ -16,7 +16,9 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.soverloadtracker.WatchListenerService.Companion.sendSettingsUpdate
 import com.example.soverloadtracker.detailsViews.DetailsActivity
+import com.example.soverloadtracker.detailsViews.EditLogActivity
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -31,6 +33,20 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             refreshUI()
             Snackbar.make(findViewById(R.id.main), "Data Synced", Snackbar.LENGTH_SHORT).show()
+
+            //launch edit after mark end
+            val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+            if (prefs.getBoolean("launchingEdit", false)) {
+                prefs.edit().apply {
+                    putBoolean("launchingEdit", false)
+                    apply()
+                }
+
+                val mostRecentLog = database.listLogRecords().maxByOrNull { it.dateTime }
+                val intent = Intent(context, EditLogActivity::class.java)
+                intent.putExtra("LOG_TIMESTAMP", mostRecentLog?.dateTime.toString())
+                startActivity(intent)
+            }
         }
     }
 
@@ -48,6 +64,14 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
         unregisterReceiver(syncReceiver)
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        handleWatchIntent(intent)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,12 +103,37 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, DetailsActivity::class.java)
             startActivity(intent)
         }
+
+        handleWatchIntent(intent)
     }
 
     override fun onResume() {
         super.onResume()
 
         refreshUI()
+
+        //update settings if necessary
+        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+        if (prefs.getBoolean("autoTracking", false)) {
+            autoSettingsSet()
+        }
+    }
+
+    fun handleWatchIntent(intent: Intent?) {
+        //handle watch triggers
+        val isMarkEnd = intent?.getBooleanExtra("markEnd", false) ?: false
+
+        if (isMarkEnd) {
+            WatchListenerService.sendSyncRequest(this)
+
+            val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+            prefs.edit().apply {
+                putBoolean("launchingEdit", true)
+                apply()
+            }
+        }
+
+        intent?.removeExtra("markEnd")
     }
 
     /**
@@ -256,6 +305,45 @@ class MainActivity : AppCompatActivity() {
         }
 
         return commonFactors
+    }
+
+    /**
+     * Checks for factors to be autotracked and triggers a sending of them to the watch
+     */
+    fun autoSettingsSet() {
+        val highFrequencyThreshold = 60
+
+        val triggerList = database.getTriggers()
+        val allLogs = database.listLogRecords()
+        val frequencyMap = FrequencyCalcHelper.calculateFactorPercentages(this, allLogs)
+
+        var brightLight = false
+        var strobeLight = false
+        var loudSound = false
+
+        //check trigger db
+        if (triggerList.contains(getString(R.string.factor_brightness))) {
+            brightLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_strobing))) {
+            strobeLight = true
+        }
+        if (triggerList.contains(getString(R.string.factor_loud))) {
+            loudSound = true
+        }
+
+        //check by frequency
+        if ((frequencyMap[getString(R.string.factor_brightness)] ?: 0) > highFrequencyThreshold) {
+            brightLight = true
+        }
+        if ((frequencyMap[getString(R.string.factor_strobing)] ?: 0) > highFrequencyThreshold) {
+            strobeLight = true
+        }
+        if ((frequencyMap[getString(R.string.factor_loud)] ?: 0) > highFrequencyThreshold) {
+            loudSound = true
+        }
+
+        sendSettingsUpdate(this, brightLight, strobeLight, loudSound)
     }
 
 }

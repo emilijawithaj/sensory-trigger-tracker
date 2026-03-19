@@ -28,7 +28,7 @@
       </SelectionState>
       <SelectionState runConfigName="mobile">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-03-01T21:41:58.018419400Z">
+        <DropdownSelection timestamp="2026-03-19T16:06:46.506795900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RFCY21PCMTJ" />

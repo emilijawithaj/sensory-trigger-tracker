@@ -14,68 +14,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Air
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
-import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.ButtonDefaults
-import androidx.wear.compose.material3.CheckboxButton
-import androidx.wear.compose.material3.CircularProgressIndicator
-import androidx.wear.compose.material3.FilledTonalButton
-import androidx.wear.compose.material3.FilledTonalIconButton
-import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.MaterialTheme
-import androidx.wear.compose.material3.ScreenScaffold
-import androidx.wear.compose.material3.SwitchButton
-import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.TextButton
-import androidx.wear.compose.navigation.SwipeDismissableNavHost
-import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.screens.AppNavigation
+import com.example.soverloadtracker.presentation.sensorDataGathering.SensorReader
 import com.example.soverloadtracker.presentation.theme.AppTheme
-import kotlinx.coroutines.delay
 import java.time.Instant
 
 
@@ -87,6 +41,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.UPSIDE_DOWN_CAKE, version = 13)
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -101,7 +56,11 @@ class MainActivity : ComponentActivity() {
                     checkPermissions(
                         arrayListOf(
                             HealthPermissions.READ_HEART_RATE,
-                            Manifest.permission.RECORD_AUDIO
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.BODY_SENSORS_BACKGROUND,
+                            Manifest.permission.BODY_SENSORS,
+                            Manifest.permission.POST_NOTIFICATIONS,
+                            HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND
                         )
                     )
                 }, { createLog(Instant.now()) })
@@ -214,8 +173,7 @@ fun WearApp(goToPermissions: () -> Unit, createLog: (Instant) -> LogData) {
             activeLog = activeLog,
             database = database,
             goToPermissions = goToPermissions,
-            createLog = createLog,
-            onLogUpdate = { updatedLog -> activeLog = updatedLog }
+            createLog = createLog
         )
     }
 

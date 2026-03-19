@@ -13,8 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.MaterialTheme
@@ -24,6 +28,8 @@ import androidx.wear.compose.navigation.composable
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.dataStorage.SettingsManager
+import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
 import kotlinx.coroutines.delay
 import java.time.Instant
 
@@ -32,7 +38,6 @@ fun AppNavigation(
     navController: NavHostController,
     activeLog: LogData?,
     database: SqLiteDatabase,
-    onLogUpdate: (LogData) -> Unit,
     goToPermissions: () -> Unit,
     createLog: (Instant) -> LogData,
 ) {
@@ -130,7 +135,7 @@ fun AppNavigation(
         // Tag menu
         composable(Destinations.TAGS_MENU) {
             AddTagsPage(activeLog!!) { log ->
-                activeLog = log;
+                activeLog = log
                 activeLog?.let {
                     database.addLogRecord(it)
                     navController.navigate(Destinations.END_BUTTON) {
@@ -151,7 +156,18 @@ fun AppNavigation(
 
         //Settings
         composable(Destinations.SETTINGS) {
-            SettingsPage()
+            //set up settings ViewModel
+            val context = LocalContext.current
+            val viewModel: SettingsViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        val manager = SettingsManager(context)
+                        return SettingsViewModel(manager, context.applicationContext) as T
+                    }
+                }
+            )
+
+            SettingsPage(viewModel)
         }
     }
 }
