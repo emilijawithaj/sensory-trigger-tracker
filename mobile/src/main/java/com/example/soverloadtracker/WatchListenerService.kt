@@ -26,8 +26,8 @@ class WatchListenerService : WearableListenerService() {
      * Handles incoming messages from the watch
      */
     override fun onMessageReceived(messageEvent: MessageEvent) {
-        Log.d(TAG, "onMessageReceived(): $messageEvent")
-        Log.d(TAG, String(messageEvent.data))
+        Log.d(TAG, "onMessageReceived(): ${messageEvent.path}")
+        //Log.d(TAG, String(messageEvent.data))
 
         //handle automatic factor background tracking being turned on or off
         if (messageEvent.path == "/autoTracking") {
@@ -46,6 +46,7 @@ class WatchListenerService : WearableListenerService() {
 
         //handle edit launch on mark end
         if (messageEvent.path == "/markEnd") {
+            Log.d(TAG, "Mark end received.")
             val startIntent = Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("markEnd", true)
@@ -191,7 +192,7 @@ class WatchListenerService : WearableListenerService() {
 
                     for (node in nodes) {
                         messageClient.sendMessage(node.id, "/tracking", payload).await()
-                        Log.d(TAG, "Synced tracking factors to node: ${node.displayName}")
+                        Log.d(TAG, "Synced tracking factors to node: ${node.displayName}, payload: $payload")
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error sending settings update request", e)

@@ -37,7 +37,6 @@ class BackgroundHeartRateService : PassiveListenerService() {
         runBlocking { delay(3500L) }
 
         //get settings values
-        val autoTriggerEnabled = runBlocking { settingsManager.autoTriggersFlow.first() }
         val checkingForBright = runBlocking { settingsManager.strobingLightFlow.first() }
         val checkingForStrobing = runBlocking { settingsManager.brightLightFlow.first() }
         val checkingForLoud = runBlocking { settingsManager.loudSoundFlow.first() }
@@ -71,13 +70,6 @@ class BackgroundHeartRateService : PassiveListenerService() {
         if (checkingForLoud && sensorReadManager.dataProcessor.isLoudSound()) {
             sendAlert(getString(R.string.high_hr_detected_in_loud_environment))
         }
-    }
-
-    /**
-     * Identify factors to be caught based on frequency of occurrences
-     */
-    private fun extractFactorsForAutoTracking() {
-
     }
 
     /**
@@ -117,6 +109,8 @@ class BackgroundHeartRateService : PassiveListenerService() {
 
         // Show Notification
         notificationManager.notify(getString(R.string.potential_overload_alert).hashCode(), notification)
+
+        Log.d("HRateBG", "Alert sent")
     }
 
 

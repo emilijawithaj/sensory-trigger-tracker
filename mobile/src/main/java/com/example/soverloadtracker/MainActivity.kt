@@ -67,20 +67,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
 
-        //handle watch triggers
-        val watchMessage = intent.getBooleanExtra("markEnd", false)
-        val context = this
-        val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
-
-        if (watchMessage) {
-            WatchListenerService.sendSyncRequest(context)
-
-            prefs.edit().apply {
-                putBoolean("launchingEdit", true)
-                apply()
-            }
-        }
+        handleWatchIntent(intent)
     }
 
 
@@ -114,6 +103,8 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, DetailsActivity::class.java)
             startActivity(intent)
         }
+
+        handleWatchIntent(intent)
     }
 
     override fun onResume() {
@@ -123,9 +114,26 @@ class MainActivity : AppCompatActivity() {
 
         //update settings if necessary
         val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
-        if (prefs.getBoolean("autoTracking", true)) {
+        if (prefs.getBoolean("autoTracking", false)) {
             autoSettingsSet()
         }
+    }
+
+    fun handleWatchIntent(intent: Intent?) {
+        //handle watch triggers
+        val isMarkEnd = intent?.getBooleanExtra("markEnd", false) ?: false
+
+        if (isMarkEnd) {
+            WatchListenerService.sendSyncRequest(this)
+
+            val prefs = getSharedPreferences("SOverloadSettings", MODE_PRIVATE)
+            prefs.edit().apply {
+                putBoolean("launchingEdit", true)
+                apply()
+            }
+        }
+
+        intent?.removeExtra("markEnd")
     }
 
     /**
@@ -325,13 +333,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         //check by frequency
-        if (frequencyMap[getString(R.string.factor_brightness)]!! > highFrequencyThreshold) {
+        if ((frequencyMap[getString(R.string.factor_brightness)] ?: 0) > highFrequencyThreshold) {
             brightLight = true
         }
-        if (frequencyMap[getString(R.string.factor_strobing)]!! > highFrequencyThreshold) {
+        if ((frequencyMap[getString(R.string.factor_strobing)] ?: 0) > highFrequencyThreshold) {
             strobeLight = true
         }
-        if (frequencyMap[getString(R.string.factor_loud)]!! > highFrequencyThreshold) {
+        if ((frequencyMap[getString(R.string.factor_loud)] ?: 0) > highFrequencyThreshold) {
             loudSound = true
         }
 

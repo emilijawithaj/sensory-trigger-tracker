@@ -15,10 +15,12 @@ import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class PhoneListenerService : WearableListenerService() {
     private val dataClient by lazy { Wearable.getDataClient(this) }
@@ -93,15 +95,17 @@ class PhoneListenerService : WearableListenerService() {
                 }
 
                 //send
-                val putDataMapRequest = PutDataMapRequest.create("/syncLogs").apply {
-                    dataMap.putDataMapArrayList("logList", logDataMapList)
-                    dataMap.putLong("timestamp", System.currentTimeMillis())
+                withContext(NonCancellable) {
+                    val putDataMapRequest = PutDataMapRequest.create("/syncLogs").apply {
+                        dataMap.putDataMapArrayList("logList", logDataMapList)
+                        dataMap.putLong("timestamp", System.currentTimeMillis())
+                    }
+
+                    val putDataRequest = putDataMapRequest.asPutDataRequest()
+                    dataClient.putDataItem(putDataRequest).await()
+
+                    Log.d(TAG, "Successfully sent ${logs.size} logs to the phone.")
                 }
-
-                val putDataRequest = putDataMapRequest.asPutDataRequest()
-                dataClient.putDataItem(putDataRequest).await()
-
-                Log.d(TAG, "Successfully sent ${logs.size} logs to the phone.")
 
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to send log data to phone.", e)
@@ -156,6 +160,7 @@ class PhoneListenerService : WearableListenerService() {
                             "/markEnd",
                             "true".toByteArray()
                         ).await()
+                        Log.d(TAG, "Sent mark end message to node: ${node.displayName}")
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error sending mark end message.", e)

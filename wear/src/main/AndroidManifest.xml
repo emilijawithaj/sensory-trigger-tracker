@@ -54,9 +54,10 @@
                 <data android:scheme="wear" />
                 <data android:host="*" />
                 <data android:pathPrefix="/sync" />
-                <data android:scheme="wear" />
-                <data android:host="*" />
                 <data android:pathPrefix="/delete" />
+                <data android:pathPrefix="/tracking" />
+                <data android:pathPrefix="/markEnd" />
+                <data android:pathPrefix="/autoTracking" />
             </intent-filter>
         </service>
         <service
