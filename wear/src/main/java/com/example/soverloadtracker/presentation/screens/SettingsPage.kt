@@ -93,7 +93,7 @@ fun SettingsPage(viewModel: SettingsViewModel) {
                 label = {
                     Text(stringResource(R.string.bright_lights))
                 },
-                enabled = !isAutoTriggersEnabled && isBackgroundTrackingEnabled, 
+                enabled = !isAutoTriggersEnabled && isBackgroundTrackingEnabled,
                 modifier = Modifier.fillMaxWidth()
             )
         }
