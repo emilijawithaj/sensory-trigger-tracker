@@ -139,7 +139,7 @@ class LogsHistoryFragment : Fragment() {
             val title = TextView(requireContext()).apply {
                 val formatter = java.time.format.DateTimeFormatter
                     .ofLocalizedDateTime(java.time.format.FormatStyle.MEDIUM)
-                    .withZone(java.time.ZoneId.systemDefault())
+                    .withZone(ZoneId.systemDefault())
                 text = formatter.format(log.dateTime)
             }
 
