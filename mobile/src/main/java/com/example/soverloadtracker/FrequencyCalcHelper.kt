@@ -1,10 +1,8 @@
 package com.example.soverloadtracker
 
 import android.content.Context
-import androidx.core.content.ContextCompat.getString
 import com.example.soverloadtracker.dataStorage.LogData
 import com.example.soverloadtracker.dataStorage.Tag
-import kotlin.collections.set
 
 /**
  * Class of static helper functions for log data processing
@@ -38,23 +36,13 @@ class FrequencyCalcHelper {
          * @return Map of tag titles to their number of occurrences
          */
         fun calculateTagFrequency(tags: List<Tag>): Map<String, Int> {
-            val frequencies = mutableMapOf<String, Int>()
-            if (tags.isEmpty()) return frequencies
+            if (tags.isEmpty()) return emptyMap()
 
-            val tagNames = extractTagNames(tags)
-            val tagsChecked = arrayListOf<String>()
-
-            for (tag in tagNames) {
-
-                if (!tagsChecked.contains(tag)) {
-                    frequencies[tag] = tagNames.count { it == tag }
-                    tagsChecked.add(tag)
-                }
-            }
-
-            return frequencies
+            return tags
+                .map { it.name }
+                .groupingBy { it.lowercase() } //lowercase for no case sensitivity
+                .eachCount()
         }
-
         /**
          * Calculates the percentage of times each tag has appeared, and returns a Map of this
          * @param tags The tags to be evaluated
