@@ -53,6 +53,7 @@
     <string name="add_tag_dialog_title">Tag to Add:</string>
     <string name="add_tag_prompt">e.g. Fatigue</string>
     <string name="delete_log_button">Delete Log</string>
+    <string name="calendar_month">%1$s</string>
 
     <!-- Details page -->
     <string-array name="tabTitles">

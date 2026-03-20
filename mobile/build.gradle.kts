@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.soverloadtracker"
-        minSdk = 31
+        minSdk = 34
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -47,5 +47,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.view)
     wearApp(project(":wear"))
 }
