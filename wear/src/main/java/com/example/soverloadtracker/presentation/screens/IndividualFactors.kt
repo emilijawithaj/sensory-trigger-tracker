@@ -36,9 +36,9 @@ import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataC
 @Composable
 fun LogTouchMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
-    var textureSelected by remember { mutableStateOf(false) }
-    var personalSpaceSelected by remember { mutableStateOf(false) }
-    var otherSelected by remember { mutableStateOf(false) }
+    var textureSelected by remember { mutableStateOf(currentLog.tactileBad) }
+    var personalSpaceSelected by remember { mutableStateOf(currentLog.tactilePersonalContact) }
+    var otherSelected by remember { mutableStateOf(currentLog.tactileOther) }
 
     val columnState = rememberTransformingLazyColumnState()
 
@@ -120,8 +120,8 @@ fun LogTouchMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 @Composable
 fun LogSmellMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
-    var strongSelected by remember { mutableStateOf(false) }
-    var otherSelected by remember { mutableStateOf(false) }
+    var strongSelected by remember { mutableStateOf(currentLog.smellStrong) }
+    var otherSelected by remember { mutableStateOf(currentLog.smellOther) }
 
     val columnState = rememberTransformingLazyColumnState()
 
@@ -196,9 +196,9 @@ fun LogSmellMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 @Composable
 fun LogTasteMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
-    var strongSelected by remember { mutableStateOf(false) }
-    var badSelected by remember { mutableStateOf(false) }
-    var otherSelected by remember { mutableStateOf(false) }
+    var strongSelected by remember { mutableStateOf(currentLog.tasteStrong) }
+    var badSelected by remember { mutableStateOf(currentLog.tasteBad) }
+    var otherSelected by remember { mutableStateOf(currentLog.tasteOther) }
 
     val columnState = rememberTransformingLazyColumnState()
 
@@ -284,7 +284,7 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
     var brightSelected by remember { mutableStateOf(currentLog.avgLux >= SensorDataComputer.HIGH_LIGHT_LEVEL) }
     var strobingSelected by remember { mutableStateOf(currentLog.luxStdev >= SensorDataComputer.STROBING_STDEV_THRESHOLD) }
-    var otherSelected by remember { mutableStateOf(false) }
+    var otherSelected by remember { mutableStateOf(currentLog.lightOther) }
 
     val columnState = rememberTransformingLazyColumnState()
 
@@ -377,7 +377,7 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
     var loudSelected by remember { mutableStateOf(currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD) }
-    var otherSelected by remember { mutableStateOf(false) }
+    var otherSelected by remember { mutableStateOf(currentLog.noiseOther) }
 
     val columnState = rememberTransformingLazyColumnState()
 
