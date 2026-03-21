@@ -15,7 +15,7 @@ class SensorDataComputer {
         const val HIGH_LIGHT_LEVEL = 150f
         const val LIGHT_SAMPLE_MIN = 4
         const val STROBING_STDEV_THRESHOLD = 40
-        const val DECIBEL_THRESHOLD = 80
+        const val DECIBEL_THRESHOLD = 60
         const val HIGH_HR_THRESHOLD = 50
     }
 
@@ -37,7 +37,7 @@ class SensorDataComputer {
         }
 
         val mean = lightReads.average()
-        val sumOfSquaredDifferences = lightReads.sumOf { (it.toDouble() - mean) * (it - mean) }
+        val sumOfSquaredDifferences = lightReads.sumOf { (it.toDouble() - mean) * (it.toDouble() - mean) }
         val variance = sumOfSquaredDifferences / (lightReads.size - 1)
         val stdev = sqrt(variance)
         lightStdev = stdev.toFloat()

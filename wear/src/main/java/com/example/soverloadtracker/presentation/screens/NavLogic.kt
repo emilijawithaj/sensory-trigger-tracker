@@ -88,7 +88,7 @@ fun AppNavigation(
         composable(Destinations.EXTRA_FACTORS) {
             ExtraFactorsPrompt(
                 onSkip = {
-                    activeLog?.let { database.addLogRecord(it) }
+                    activeLog?.let { database.addLogRecord(it)}
                     navController.navigate(Destinations.END_BUTTON) {
                         popUpTo(Destinations.END_BUTTON) { inclusive = true }
                     }

@@ -132,7 +132,7 @@ class SensorReader(private val context: Context,
             if (event?.sensor?.type == Sensor.TYPE_LIGHT) {
                 val luxValue = event.values[0]
                 lightReads.add(luxValue)
-                Log.d("OUTPUTPRESENT", "Light sensor reading: $luxValue lux")
+                Log.d("LOGPROCESS", "Light sensor reading: $luxValue lux")
 
             }
         }
@@ -169,11 +169,8 @@ class SensorReader(private val context: Context,
             Log.d("LOGREAD", "5 second timer finished. Unregistering listener.")
             sensorManager.unregisterListener(lightSensorListener)
             dataProcessor.lightReads = lightReads
-            //TODO DEBUG
-            /*
             dataProcessor.isLightStrobing()
             dataProcessor.isLightBright()
-             */
         }
     }
 
@@ -194,10 +191,10 @@ class SensorReader(private val context: Context,
                 setOutputFile(outputFile.absolutePath)
                 prepare()
                 start()
-                Log.d("SoundRecorder", "MediaRecorder started successfully.")
+                Log.d("LOGPROCESS", "MediaRecorder started successfully.")
             }
         } catch (e: IOException) {
-            Log.e("SoundRecorder", "MediaRecorder prepare() failed", e)
+            Log.e("LOGPROCESS", "MediaRecorder prepare() failed", e)
             recorder = null // Ensure recorder is null if start fails
         }
     }
@@ -216,12 +213,11 @@ class SensorReader(private val context: Context,
             startRecorder()
             // If the recorder failed to start, don't
     if (recorder == null) {
-        Log.e("SoundRecorder", "Cannot take reading, recorder is not initialized.")
-        //TODO THROW HERE
+        Log.e("LOGPROCESS", "Cannot take reading, recorder is not initialized.")
         return@launch
     }
 
-    Log.d("SoundRecorder", "Starting 5-second sound measurement.")
+    Log.d("LOGPROCESS", "Starting 5-second sound measurement.")
     soundReadings.clear()
 
     val startTime = System.currentTimeMillis()
@@ -234,12 +230,12 @@ class SensorReader(private val context: Context,
             soundReadings.add(db)
         }
 
-        Log.v("OUTPUTPRESENT", "Current vol in Decibels: $db")
+        Log.v("LOGPROCESS", "Current vol in Decibels: $db")
         delay(250) // Read the amplitude 4 times per second
     }
 
     stopRecorder()
-    Log.d("SoundRecorder", "Finished 5-second sound measurement. Readings: ${soundReadings.size}")
+    Log.d("LOGPROCESS", "Finished 5-second sound measurement. Readings: ${soundReadings.size}")
 }
 }
 

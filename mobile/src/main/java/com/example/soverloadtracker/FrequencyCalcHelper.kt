@@ -11,7 +11,7 @@ class FrequencyCalcHelper {
 
     companion object {
         //default threshold values
-        var loudSoundDef = 80
+        var loudSoundDef = 60
         var brightLightDef = 150f
         var strobingLightDef = 40
 
