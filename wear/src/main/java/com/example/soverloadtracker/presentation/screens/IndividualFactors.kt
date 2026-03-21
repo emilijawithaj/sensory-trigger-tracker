@@ -25,6 +25,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
 
 
 /**
@@ -281,8 +282,8 @@ fun LogTasteMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 @Composable
 fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
-    var brightSelected by remember { mutableStateOf(false) }
-    var strobingSelected by remember { mutableStateOf(false) }
+    var brightSelected by remember { mutableStateOf(currentLog.avgLux >= SensorDataComputer.HIGH_LIGHT_LEVEL) }
+    var strobingSelected by remember { mutableStateOf(currentLog.luxStdev >= SensorDataComputer.STROBING_STDEV_THRESHOLD) }
     var otherSelected by remember { mutableStateOf(false) }
 
     val columnState = rememberTransformingLazyColumnState()
@@ -335,8 +336,17 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
             item {
                 Button(
                     onClick = {
-                        currentLog.avgLux = 999f
-                        currentLog.luxStdev = 999f
+                        if (brightSelected && currentLog.avgLux <= SensorDataComputer.HIGH_LIGHT_LEVEL) {
+                            currentLog.avgLux = 999f
+                        } else if (!brightSelected && currentLog.avgLux > SensorDataComputer.HIGH_LIGHT_LEVEL) {
+                            currentLog.avgLux = -1f
+                        }
+
+                        if (strobingSelected && currentLog.luxStdev <= SensorDataComputer.STROBING_STDEV_THRESHOLD) {
+                            currentLog.luxStdev = 999f
+                        } else if (!strobingSelected && currentLog.luxStdev > SensorDataComputer.STROBING_STDEV_THRESHOLD) {
+                            currentLog.luxStdev = -1f
+                        }
                         currentLog.lightOther = otherSelected
 
                         onNext(currentLog)
@@ -366,7 +376,7 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 @Composable
 fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
     // state management for toggles
-    var loudSelected by remember { mutableStateOf(false) }
+    var loudSelected by remember { mutableStateOf(currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD) }
     var otherSelected by remember { mutableStateOf(false) }
 
     val columnState = rememberTransformingLazyColumnState()
@@ -412,7 +422,11 @@ fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
             item {
                 Button(
                     onClick = {
-                        currentLog.avgDecibels = 999f
+                        if (loudSelected && currentLog.avgDecibels <= SensorDataComputer.DECIBEL_THRESHOLD) {
+                            currentLog.avgDecibels = 999f
+                        } else if (!loudSelected && currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD){
+                            currentLog.avgDecibels = -1f
+                        }
                         currentLog.noiseOther = otherSelected
 
                         onNext(currentLog)

@@ -18,7 +18,6 @@ class SensorDataComputer {
         const val DECIBEL_THRESHOLD = 60
         const val HIGH_HR_THRESHOLD = 50
     }
-
     /**
      * Guess whether the user in a strobing light environment based on the
      * standard deviation of the light readings data set.
@@ -49,6 +48,7 @@ class SensorDataComputer {
         Log.d("LOGPROCESS", "Is not strobing.")
         return false
     }
+
 
     /**
      * Return true if average of light reads is above the threshold
