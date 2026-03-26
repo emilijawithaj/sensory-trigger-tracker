@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.util.TypedValue.applyDimension
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,7 +12,6 @@ import com.example.soverloadtracker.FrequencyCalcHelper
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.dataStorage.LogData
-import com.example.soverloadtracker.dataStorage.Tag
 import com.google.android.material.card.MaterialCardView
 
 class FactorsFragment : Fragment() {
@@ -115,19 +113,38 @@ class FactorsFragment : Fragment() {
         //get percentages
         val factorMap = FrequencyCalcHelper.calculateFactorPercentages(requireContext(), logs)
 
-        val brightLightPercentage = factorMap.getValue(getString(R.string.factor_brightness))
-        val strobeLightPercentage = factorMap.getValue(getString(R.string.factor_strobing))
-        val lightOtherPercentage = factorMap.getValue(getString(R.string.factor_light_manual))
-        val loudSoundPercentage = factorMap.getValue(getString(R.string.factor_loud))
-        val otherSoundPercentage = factorMap.getValue(getString(R.string.factor_noise_manual))
-        val smellStrongPercentage = factorMap.getValue(getString(R.string.factor_smell_strong))
-        val smellOtherPercentage = factorMap.getValue(getString(R.string.factor_smell_other))
-        val textureTouchPercentage = factorMap.getValue(getString(R.string.factor_touch_texture))
-        val personalSpacePercentage = factorMap.getValue(getString(R.string.factor_personal_space))
-        val touchOtherPercentage = factorMap.getValue(getString(R.string.factor_touch_other))
-        val strongTastePercentage = factorMap.getValue(getString(R.string.factor_taste_strong))
-        val badTastePercentage = factorMap.getValue(getString(R.string.factor_taste_bad))
-        val otherTastePercentage = factorMap.getValue(getString(R.string.factor_taste_other))
+
+        var brightLightPercentage = 0
+        var strobeLightPercentage = 0
+        var lightOtherPercentage = 0
+        var loudSoundPercentage = 0
+        var otherSoundPercentage = 0
+        var smellStrongPercentage = 0
+        var smellOtherPercentage = 0
+        var textureTouchPercentage = 0
+        var personalSpacePercentage = 0
+        var touchOtherPercentage = 0
+        var strongTastePercentage = 0
+        var badTastePercentage = 0
+        var otherTastePercentage = 0
+
+        if (!logs.isEmpty()) {
+            brightLightPercentage = factorMap.getValue(getString(R.string.factor_brightness))
+            strobeLightPercentage = factorMap.getValue(getString(R.string.factor_strobing))
+            lightOtherPercentage = factorMap.getValue(getString(R.string.factor_light_manual))
+            loudSoundPercentage = factorMap.getValue(getString(R.string.factor_loud))
+            otherSoundPercentage = factorMap.getValue(getString(R.string.factor_noise_manual))
+            smellStrongPercentage = factorMap.getValue(getString(R.string.factor_smell_strong))
+            smellOtherPercentage = factorMap.getValue(getString(R.string.factor_smell_other))
+            textureTouchPercentage =
+                factorMap.getValue(getString(R.string.factor_touch_texture))
+            personalSpacePercentage =
+                factorMap.getValue(getString(R.string.factor_personal_space))
+            touchOtherPercentage = factorMap.getValue(getString(R.string.factor_touch_other))
+            strongTastePercentage = factorMap.getValue(getString(R.string.factor_taste_strong))
+            badTastePercentage = factorMap.getValue(getString(R.string.factor_taste_bad))
+            otherTastePercentage = factorMap.getValue(getString(R.string.factor_taste_other))
+        }
 
         //populate
         val brightLightFreq = requireView().findViewById<TextView>(R.id.bright_light_freq)
