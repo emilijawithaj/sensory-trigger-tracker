@@ -28,6 +28,6 @@ fun EndButton(nextButtonOnClick: () -> Unit) {
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
-        Text("Mark End", textAlign = TextAlign.Center)
+        Text("End", textAlign = TextAlign.Center)
     }
 }
