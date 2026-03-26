@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.screens.AppNavigation
+import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorReader
 import com.example.soverloadtracker.presentation.theme.AppTheme
 import java.time.Instant
@@ -49,21 +50,24 @@ class MainActivity : ComponentActivity() {
         setTheme(style.Theme_DeviceDefault)
         //val userDB = SqLiteDatabase.getInstance(this)
         //userDB.onUpgrade(userDB.writableDatabase, 1, 1)
+        updateThresholds()
 
         setContent {
             AppTheme {
-                WearApp({
-                    checkPermissions(
-                        arrayListOf(
-                            HealthPermissions.READ_HEART_RATE,
-                            Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.BODY_SENSORS_BACKGROUND,
-                            Manifest.permission.BODY_SENSORS,
-                            Manifest.permission.POST_NOTIFICATIONS,
-                            HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND
+                WearApp(
+                    {
+                        checkPermissions(
+                            arrayListOf(
+                                HealthPermissions.READ_HEART_RATE,
+                                Manifest.permission.RECORD_AUDIO,
+                                Manifest.permission.BODY_SENSORS_BACKGROUND,
+                                Manifest.permission.BODY_SENSORS,
+                                Manifest.permission.POST_NOTIFICATIONS,
+                                HealthPermissions.READ_HEALTH_DATA_IN_BACKGROUND
+                            )
                         )
-                    )
-                }, { createLog(Instant.now()) })
+                    },
+                    { createLog(Instant.now()) })
             }
         }
     }
@@ -155,6 +159,53 @@ class MainActivity : ComponentActivity() {
 
         return logData
     }
+
+    fun updateThresholds() {
+        val minRecordThreshold = 3
+
+        val userDB = SqLiteDatabase.getInstance(this)
+        val brightRecords = userDB.listBrightRecords()
+        val loudRecords = userDB.listLoudnessRecords()
+
+        //check light
+        if (brightRecords.size > minRecordThreshold) {
+            val trueBrightRecords = brightRecords.filter { it.consideredPresent }
+            val falseBrightRecords = brightRecords.filter { !it.consideredPresent }
+
+            val avgTrue: Double = if (trueBrightRecords.isNotEmpty()) {
+                trueBrightRecords.map { it.value }.average()
+            } else {
+                falseBrightRecords.map { it.value }.average()
+            }
+
+            val avgFalse: Double = if (falseBrightRecords.isNotEmpty()) {
+                falseBrightRecords.map { it.value }.average()
+            } else {
+                trueBrightRecords.map { it.value }.average()
+            }
+                SensorDataComputer.HIGH_LIGHT_LEVEL = ((avgTrue + avgFalse) / 2).toFloat()
+                Log.d("LOGPROCESS", "New light threshold: ${SensorDataComputer.HIGH_LIGHT_LEVEL}")
+        }
+        //check sound
+        if (loudRecords.size > minRecordThreshold) {
+            val trueLoudRecords = loudRecords.filter { it.consideredPresent }
+            val falseLoudRecords = loudRecords.filter { !it.consideredPresent }
+
+            val avgTrue: Double = if (trueLoudRecords.isNotEmpty()) {
+                trueLoudRecords.map { it.value }.average()
+            } else {
+                falseLoudRecords.map { it.value }.average()
+            }
+
+            val avgFalse: Double = if (falseLoudRecords.isNotEmpty()) {
+                falseLoudRecords.map { it.value }.average()
+            } else {
+                trueLoudRecords.map { it.value }.average()
+            }
+            SensorDataComputer.DECIBEL_THRESHOLD = ((avgTrue + avgFalse) / 2).toInt()
+            Log.d("LOGPROCESS", "New sound threshold: ${SensorDataComputer.DECIBEL_THRESHOLD}")
+        }
+    }
 }
 
 /**
@@ -168,14 +219,14 @@ fun WearApp(goToPermissions: () -> Unit, createLog: (Instant) -> LogData) {
     val context = LocalContext.current
     val database = remember { SqLiteDatabase.getInstance(context) }
 
-        AppNavigation(
-            navController = navController,
-            activeLog = activeLog,
-            database = database,
-            goToPermissions = goToPermissions,
-            createLog = createLog
-        )
-    }
+    AppNavigation(
+        navController = navController,
+        activeLog = activeLog,
+        database = database,
+        goToPermissions = goToPermissions,
+        createLog = createLog
+    )
+}
 
 
 

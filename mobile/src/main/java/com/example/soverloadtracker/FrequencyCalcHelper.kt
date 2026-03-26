@@ -12,8 +12,8 @@ class FrequencyCalcHelper {
     companion object {
         //default threshold values
         var loudSoundDef = 60
-        var brightLightDef = 150f
-        var strobingLightDef = 40
+        var brightLightDef = 250f
+        var strobingLightDef = 500
 
         /**
          * Extracts tag values from a list of tag objects

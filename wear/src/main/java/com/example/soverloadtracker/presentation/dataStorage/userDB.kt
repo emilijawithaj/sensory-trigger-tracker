@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.dataStorage.ThresholdData
 import java.time.Instant
 
 class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
@@ -22,9 +23,15 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
                     " $COLUMN_TACTILE_OTHER INTEGER, $COLUMN_TASTE_STRONG INTEGER, $COLUMN_TASTE_BAD INTEGER, $COLUMN_TASTE_OTHER INTEGER)"
         val CREATE_TAG_TABLE =
             "CREATE TABLE $TABLE_TAGS ($COLUMN_TAG_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_TAG TEXT, $COLUMN_TAG_DATETIME TEXT)"
+        val CREATE_BRIGHT_THRESHOLD_TABLE = "CREATE TABLE $TABLE_BRIGHT_THRESHOLD ($COLUMN_BRIGHT_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_BRIGHT_VALUE REAL" +
+                ", $COLUMN_WAS_BRIGHT INTEGER)"
+        val CREATE_LOUD_THRESHOLD_TABLE = "CREATE TABLE $TABLE_LOUD_THRESHOLD ($COLUMN_LOUD_ID INTEGER PRIMARY KEY AUTOINCREMENT, $COLUMN_LOUD_VALUE REAL" +
+                ", $COLUMN_WAS_LOUD INTEGER)"
 
         db.execSQL(CREATE_LOG_TABLE)
         db.execSQL(CREATE_TAG_TABLE)
+        db.execSQL(CREATE_BRIGHT_THRESHOLD_TABLE)
+        db.execSQL(CREATE_LOUD_THRESHOLD_TABLE)
     }
 
     /**
@@ -33,6 +40,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     override fun onUpgrade(db: SQLiteDatabase, oldVer: Int, newVer: Int) {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_LOG")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_TAGS")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_BRIGHT_THRESHOLD")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_LOUD_THRESHOLD")
 
         onCreate(db)
     }
@@ -44,6 +53,80 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $TABLE_LOG")
         db.execSQL("DELETE FROM $TABLE_TAGS")
+    }
+
+    /**
+     * Generate and return a list of all brightness records for threshold reevaluation
+     * @return List of brightness records in format ThresholdData
+     */
+    fun listBrightRecords(): MutableList<ThresholdData> {
+        val sql = "SELECT * FROM $TABLE_BRIGHT_THRESHOLD"
+        val db = this.readableDatabase
+        val brightList = arrayListOf<ThresholdData>()
+        val cursor = db.rawQuery(sql, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val brightness = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_BRIGHT_VALUE))
+                val wasBright = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_BRIGHT)) == 1
+
+                brightList.add(ThresholdData(brightness.toFloat(), wasBright))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return brightList
+    }
+
+    /**
+     * Generate and return a list of all loudness records for threshold reevaluation
+     * @return List of loudness records in format ThresholdData
+     */
+    fun listLoudnessRecords(): MutableList<ThresholdData> {
+        val sql = "SELECT * FROM $TABLE_LOUD_THRESHOLD"
+        val db = this.readableDatabase
+        val loudList = arrayListOf<ThresholdData>()
+        val cursor = db.rawQuery(sql, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val brightness = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_LOUD_VALUE))
+                val wasBright = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_LOUD)) == 1
+
+                loudList.add(ThresholdData(brightness.toFloat(), wasBright))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return loudList
+    }
+
+    /**
+     * Adds a record of a manually over written brightness evaluation to the threshold table
+     * @param bright ThresholdData object of record to be saved
+     */
+    fun addBrightRecord(bright: ThresholdData) {
+        val values = ContentValues()
+        values.put(COLUMN_BRIGHT_VALUE, bright.value)
+        values.put(COLUMN_WAS_BRIGHT, bright.consideredPresent)
+
+        val db = this.writableDatabase
+        db.insert(TABLE_BRIGHT_THRESHOLD, null, values)
+        db.close()
+    }
+
+    /**
+     * Adds a record of a manually over written loudness evaluation to the threshold table
+     * @param loud ThresholdData object of record to be saved
+     */
+    fun addLoudRecord(loud: ThresholdData) {
+        val values = ContentValues()
+        values.put(COLUMN_LOUD_VALUE, loud.value)
+        values.put(COLUMN_WAS_LOUD, loud.consideredPresent)
+
+        val db = this.writableDatabase
+        db.insert(TABLE_LOUD_THRESHOLD, null, values)
+        db.close()
     }
 
     /**
@@ -358,5 +441,15 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
         private const val COLUMN_TAG = "tag"
         private const val COLUMN_TAG_DATETIME = "tag_datetime"
 
+
+        private const val TABLE_BRIGHT_THRESHOLD = "bright_threshold"
+        private const val COLUMN_BRIGHT_ID = "bright_id"
+        private const val COLUMN_BRIGHT_VALUE = "bright_value"
+        private const val COLUMN_WAS_BRIGHT = "was_bright"
+
+        private const val TABLE_LOUD_THRESHOLD = "loud_threshold"
+        private const val COLUMN_LOUD_ID = "loud_id"
+        private const val COLUMN_LOUD_VALUE = "loud_value"
+        private const val COLUMN_WAS_LOUD = "was_loud"
     }
 }

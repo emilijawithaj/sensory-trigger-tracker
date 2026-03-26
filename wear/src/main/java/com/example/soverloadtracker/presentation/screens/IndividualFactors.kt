@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +25,12 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
+import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.dataStorage.ThresholdData
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 /**
@@ -280,7 +285,7 @@ fun LogTasteMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
  * @param onNext Callback to move back to menu page
  */
 @Composable
-fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
+fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit, database: SqLiteDatabase) {
     // state management for toggles
     var brightSelected by remember { mutableStateOf(currentLog.avgLux >= SensorDataComputer.HIGH_LIGHT_LEVEL) }
     var strobingSelected by remember { mutableStateOf(currentLog.luxStdev >= SensorDataComputer.STROBING_STDEV_THRESHOLD) }
@@ -334,17 +339,54 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 
             //Next button
             item {
+                val scope = rememberCoroutineScope()
+
                 Button(
                     onClick = {
                         if (brightSelected && currentLog.avgLux <= SensorDataComputer.HIGH_LIGHT_LEVEL) {
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.avgLux != -1f) {
+                                    database.addBrightRecord(ThresholdData(currentLog.avgLux, true))
+                                }
+                            }
                             currentLog.avgLux = 999f
                         } else if (!brightSelected && currentLog.avgLux > SensorDataComputer.HIGH_LIGHT_LEVEL) {
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.avgLux != 999f) {
+                                    database.addBrightRecord(
+                                        ThresholdData(
+                                            currentLog.avgLux,
+                                            false
+                                        )
+                                    )
+                                }
+                            }
                             currentLog.avgLux = -1f
                         }
 
                         if (strobingSelected && currentLog.luxStdev <= SensorDataComputer.STROBING_STDEV_THRESHOLD) {
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.luxStdev != -1f) {
+                                    database.addBrightRecord(
+                                        ThresholdData(
+                                            currentLog.luxStdev,
+                                            true
+                                        )
+                                    )
+                                }
+                            }
                             currentLog.luxStdev = 999f
                         } else if (!strobingSelected && currentLog.luxStdev > SensorDataComputer.STROBING_STDEV_THRESHOLD) {
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.luxStdev != 999f) {
+                                    database.addBrightRecord(
+                                        ThresholdData(
+                                            currentLog.luxStdev,
+                                            false
+                                        )
+                                    )
+                                }
+                            }
                             currentLog.luxStdev = -1f
                         }
                         currentLog.lightOther = otherSelected
@@ -374,7 +416,7 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
  * @param onNext Callback to move back to menu page
  */
 @Composable
-fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
+fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit, database: SqLiteDatabase) {
     // state management for toggles
     var loudSelected by remember { mutableStateOf(currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD) }
     var otherSelected by remember { mutableStateOf(currentLog.noiseOther) }
@@ -420,11 +462,33 @@ fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
 
             //Next button
             item {
+                val scope = rememberCoroutineScope()
+
                 Button(
                     onClick = {
                         if (loudSelected && currentLog.avgDecibels <= SensorDataComputer.DECIBEL_THRESHOLD) {
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.avgDecibels != -1f) {
+                                    database.addLoudRecord(
+                                        ThresholdData(
+                                            currentLog.avgDecibels,
+                                            true
+                                        )
+                                    )
+                                }
+                            }
                             currentLog.avgDecibels = 999f
                         } else if (!loudSelected && currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD){
+                            scope.launch(Dispatchers.IO) {
+                                if (currentLog.avgDecibels != 999f) {
+                                    database.addLoudRecord(
+                                        ThresholdData(
+                                            currentLog.avgDecibels,
+                                            false
+                                        )
+                                    )
+                                }
+                            }
                             currentLog.avgDecibels = -1f
                         }
                         currentLog.noiseOther = otherSelected

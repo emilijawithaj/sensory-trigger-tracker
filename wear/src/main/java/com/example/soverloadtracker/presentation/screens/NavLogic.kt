@@ -110,13 +110,13 @@ fun AppNavigation(
             val type = backStackEntry.arguments?.getString("type")
 
             when (type) {
-                "light" -> LogLightMenu(activeLog!!) { log ->
+                "light" -> LogLightMenu(activeLog!!, { log ->
                     activeLog = log; navController.popBackStack()
-                }
+                }, database)
 
-                "sound" -> LogSoundMenu(activeLog!!) { log ->
+                "sound" -> LogSoundMenu(activeLog!!, { log ->
                     activeLog = log; navController.popBackStack()
-                }
+                }, database)
 
                 "touch" -> LogTouchMenu(activeLog!!) { log ->
                     activeLog = log; navController.popBackStack()
