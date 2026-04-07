@@ -60,5 +60,7 @@
     <string name="high_hr_detected_with_bright_light_present">High HR detected with bright light present</string>
     <string name="high_hr_detected_with_strobing_light_present">High HR detected with strobing light present</string>
     <string name="high_hr_detected_in_loud_environment">High HR detected in loud environment</string>
+    <string name="reminder_notif_text">A log was recently added but may not contain all factors. Tap to add or change any details on your mobile device.</string>
+    <string name="reminder_notif_title">Want to revise your log?</string>
 
 </resources>

@@ -25,13 +25,18 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.LogData
 import com.example.soverloadtracker.presentation.dataStorage.SettingsManager
 import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
+import com.example.soverloadtracker.presentation.reminders.ReminderWorker
 import kotlinx.coroutines.delay
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun AppNavigation(
@@ -147,7 +152,25 @@ fun AppNavigation(
 
         //End button
         composable(Destinations.END_BUTTON) {
+            val context = LocalContext.current
+            val workManager = remember { WorkManager.getInstance(context) }
+
+            // Schedule notification when this page is entered
+            LaunchedEffect(Unit) {val reminderRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
+                .setInitialDelay(2, TimeUnit.HOURS)
+                .addTag("log_reminder")
+                .build()
+
+                workManager.enqueueUniqueWork(
+                    "end_button_reminder",
+                    ExistingWorkPolicy.REPLACE, //restart timer if they reach here again
+                    reminderRequest
+                )
+            }
             EndButton {
+                //cancel notification if the button gets pressed
+                workManager.cancelUniqueWork("end_button_reminder")
+
                 navController.navigate(Destinations.LOG_BUTTON) {
                     popUpTo(Destinations.LOG_BUTTON) { inclusive = true }
                 }
