@@ -26,7 +26,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
-import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.dataStorage.LogData
 import com.example.soverloadtracker.presentation.dataStorage.ThresholdData
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
 import kotlinx.coroutines.Dispatchers
@@ -339,56 +339,15 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit, database: SqLit
 
             //Next button
             item {
-                val scope = rememberCoroutineScope()
-
                 Button(
                     onClick = {
-                        if (brightSelected && currentLog.avgLux <= SensorDataComputer.HIGH_LIGHT_LEVEL) {
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.avgLux != -1f) {
-                                    database.addBrightRecord(ThresholdData(currentLog.avgLux, true))
-                                }
-                            }
-                            currentLog.avgLux = 999f
-                        } else if (!brightSelected && currentLog.avgLux > SensorDataComputer.HIGH_LIGHT_LEVEL) {
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.avgLux != 999f) {
-                                    database.addBrightRecord(
-                                        ThresholdData(
-                                            currentLog.avgLux,
-                                            false
-                                        )
-                                    )
-                                }
-                            }
-                            currentLog.avgLux = -1f
-                        }
 
                         if (strobingSelected && currentLog.luxStdev <= SensorDataComputer.STROBING_STDEV_THRESHOLD) {
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.luxStdev != -1f) {
-                                    database.addBrightRecord(
-                                        ThresholdData(
-                                            currentLog.luxStdev,
-                                            true
-                                        )
-                                    )
-                                }
-                            }
                             currentLog.luxStdev = 999f
                         } else if (!strobingSelected && currentLog.luxStdev > SensorDataComputer.STROBING_STDEV_THRESHOLD) {
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.luxStdev != 999f) {
-                                    database.addBrightRecord(
-                                        ThresholdData(
-                                            currentLog.luxStdev,
-                                            false
-                                        )
-                                    )
-                                }
-                            }
                             currentLog.luxStdev = -1f
                         }
+                        currentLog.wasBright = brightSelected
                         currentLog.lightOther = otherSelected
 
                         onNext(currentLog)
@@ -462,35 +421,9 @@ fun LogSoundMenu(currentLog: LogData, onNext: (LogData) -> Unit, database: SqLit
 
             //Next button
             item {
-                val scope = rememberCoroutineScope()
-
                 Button(
                     onClick = {
-                        if (loudSelected && currentLog.avgDecibels <= SensorDataComputer.DECIBEL_THRESHOLD) {
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.avgDecibels != -1f) {
-                                    database.addLoudRecord(
-                                        ThresholdData(
-                                            currentLog.avgDecibels,
-                                            true
-                                        )
-                                    )
-                                }
-                            }
-                            currentLog.avgDecibels = 999f
-                        } else if (!loudSelected && currentLog.avgDecibels >= SensorDataComputer.DECIBEL_THRESHOLD){
-                            scope.launch(Dispatchers.IO) {
-                                if (currentLog.avgDecibels != 999f) {
-                                    database.addLoudRecord(
-                                        ThresholdData(
-                                            currentLog.avgDecibels,
-                                            false
-                                        )
-                                    )
-                                }
-                            }
-                            currentLog.avgDecibels = -1f
-                        }
+                        currentLog.wasLoud = loudSelected
                         currentLog.noiseOther = otherSelected
 
                         onNext(currentLog)

@@ -20,14 +20,14 @@ class SettingsManager(private val context: Context) {
         val LOUD_SOUND = booleanPreferencesKey("loud_sound")
     }
 
-    // Read settings using Flow, mapping the settings in the dataStore
+    //read settings using Flow, mapping the settings in the dataStore
     val backgroundTrackingFlow: Flow<Boolean> = context.dataStore.data.map { it[BACKGROUND_TRACKING] ?: false }
     val autoTriggersFlow: Flow<Boolean> = context.dataStore.data.map { it[AUTO_TRIGGERS] ?: false }
     val brightLightFlow: Flow<Boolean> = context.dataStore.data.map { it[BRIGHT_LIGHT] ?: false }
     val strobingLightFlow: Flow<Boolean> = context.dataStore.data.map { it[STROBING_LIGHT] ?: false }
     val loudSoundFlow: Flow<Boolean> = context.dataStore.data.map { it[LOUD_SOUND] ?: false }
 
-    // Save settings
+    //save settings
     suspend fun updateSetting(key: Preferences.Key<Boolean>, value: Boolean) {
         context.dataStore.edit { it[key] = value }
     }

@@ -12,25 +12,12 @@ class SensorDataComputer {
 
     //toggles
     companion object {
-        var HIGH_LIGHT_LEVEL = 250f
+        var HIGH_LIGHT_LEVEL = 300f
         const val LIGHT_SAMPLE_MIN = 4
         const val STROBING_STDEV_THRESHOLD = 500
         var DECIBEL_THRESHOLD = 60
-        const val HIGH_HR_THRESHOLD = 50
+        const val HIGH_HR_THRESHOLD = 80
 
-//        /**
-//         * Updates the thresholds, to be passed data based on previously logged values in the database
-//         * @param light new Light threshold
-//         * @param db new Loudness threshold
-//         */
-//        fun updateThresholds(
-//            light: Float,
-//            db: Int,
-//        ) {
-//            HIGH_LIGHT_LEVEL = light
-//            DECIBEL_THRESHOLD = db
-//            Log.d("SensorDataComputer", "Thresholds updated from database")
-//        }
     }
     /**
      * Guess whether the user in a strobing light environment based on the

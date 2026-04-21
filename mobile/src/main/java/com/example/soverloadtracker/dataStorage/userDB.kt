@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.example.soverloadtracker.dataStorage.LogData
 import com.example.soverloadtracker.dataStorage.Tag
 import java.time.Instant
+import kotlin.math.log
 
 class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     context,
@@ -17,8 +18,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
     override fun onCreate(db: SQLiteDatabase) {
         //build tables
         val CREATE_LOG_TABLE =
-            "CREATE TABLE $TABLE_LOG ($COLUMN_DATETIME TEXT PRIMARY KEY, $COLUMN_AVG_LUX REAL, $COLUMN_LUX_STDEV REAL, $COLUMN_LIGHT_OTHER INTEGER, " +
-                    " $COLUMN_AVG_DECIBELS REAL, $COLUMN_NOISE_OTHER INTEGER, " +
+            "CREATE TABLE $TABLE_LOG ($COLUMN_DATETIME TEXT PRIMARY KEY, $COLUMN_AVG_LUX REAL, $COLUMN_WAS_BRIGHT INTEGER, $COLUMN_LUX_STDEV REAL, $COLUMN_LIGHT_OTHER INTEGER, " +
+                    " $COLUMN_AVG_DECIBELS REAL, $COLUMN_WAS_LOUD INTEGER, $COLUMN_NOISE_OTHER INTEGER, " +
                     " $COLUMN_SMELL_STRONG INTEGER, $COLUMN_SMELL_OTHER INTEGER, $COLUMN_TACTILE_BAD INTEGER, $COLUMN_TACTILE_PERSONALCONTACT INTEGER, " +
                     " $COLUMN_TACTILE_OTHER INTEGER, $COLUMN_TASTE_STRONG INTEGER, $COLUMN_TASTE_BAD INTEGER, $COLUMN_TASTE_OTHER INTEGER)"
         val CREATE_TAG_TABLE =
@@ -71,6 +72,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             do {
                 val dateTime = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATETIME))
                 val avgLux = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_AVG_LUX))
+                val wasBright = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_BRIGHT)) == 1
+                val wasLoud = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_LOUD)) == 1
                 val luxStdev = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_LUX_STDEV))
                 val lightOther =
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIGHT_OTHER)) == 1
@@ -113,9 +116,11 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
                     LogData(
                         dateTimeO,
                         avgLux,
+                        wasBright,
                         luxStdev,
                         lightOther,
                         avgDecibels,
+                        wasLoud,
                         noiseOther,
                         smellStrong,
                         smellOther,
@@ -151,8 +156,10 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             //handle log values
             logValues.put(COLUMN_DATETIME, logData.dateTime.toString())
             logValues.put(COLUMN_AVG_LUX, logData.avgLux)
+            logValues.put(COLUMN_WAS_BRIGHT, logData.wasBright)
             logValues.put(COLUMN_LUX_STDEV, logData.luxStdev)
             logValues.put(COLUMN_AVG_DECIBELS, logData.avgDecibels)
+            logValues.put(COLUMN_WAS_LOUD, logData.wasLoud)
             logValues.put(COLUMN_LIGHT_OTHER, logData.lightOther)
             logValues.put(COLUMN_NOISE_OTHER, logData.noiseOther)
             logValues.put(COLUMN_SMELL_STRONG, logData.smellStrong)
@@ -218,6 +225,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             logValues.put(COLUMN_LUX_STDEV, logCurrent.luxStdev)
             logValues.put(COLUMN_AVG_DECIBELS, logCurrent.avgDecibels)
 
+            logValues.put(COLUMN_WAS_BRIGHT, logData.wasBright)
+            logValues.put(COLUMN_WAS_LOUD, logData.wasLoud)
             logValues.put(COLUMN_LIGHT_OTHER, logData.lightOther)
             logValues.put(COLUMN_NOISE_OTHER, logData.noiseOther)
             logValues.put(COLUMN_SMELL_STRONG, logData.smellStrong)
@@ -273,6 +282,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             logValues.put(COLUMN_LUX_STDEV, logData.luxStdev)
             logValues.put(COLUMN_AVG_DECIBELS, logData.avgDecibels)
 
+            logValues.put(COLUMN_WAS_BRIGHT, logData.wasBright)
+            logValues.put(COLUMN_WAS_LOUD, logData.wasLoud)
             logValues.put(COLUMN_LIGHT_OTHER, logData.lightOther)
             logValues.put(COLUMN_NOISE_OTHER, logData.noiseOther)
             logValues.put(COLUMN_SMELL_STRONG, logData.smellStrong)
@@ -321,6 +332,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
         val cursor = db.rawQuery(query, arrayOf(dateTime))
         if (cursor.moveToFirst()) {
             val avgLux = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_AVG_LUX))
+            val wasBright = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_BRIGHT)) == 1
+            val wasLoud = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_WAS_LOUD)) == 1
             val luxStdev = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_LUX_STDEV))
             val lightOther = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIGHT_OTHER)) == 1
             val avgDecibels = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_AVG_DECIBELS))
@@ -351,9 +364,11 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
             logData = LogData(
                 Instant.parse(dateTime),
                 avgLux,
+                wasBright,
                 luxStdev,
                 lightOther,
                 avgDecibels,
+                wasLoud,
                 noiseOther,
                 smellStrong,
                 smellOther,
@@ -543,5 +558,8 @@ class SqLiteDatabase(context: Context) : SQLiteOpenHelper(
         private const val COLUMN_TRIGGER_ID = "trigger_id"
         private const val COLUMN_TRIGGER = "trigger_name"
 
+        private const val COLUMN_WAS_BRIGHT = "was_bright"
+
+        private const val COLUMN_WAS_LOUD = "was_loud"
     }
 }

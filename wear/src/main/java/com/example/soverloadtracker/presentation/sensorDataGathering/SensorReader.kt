@@ -25,14 +25,18 @@ import java.io.File
 import java.io.IOException
 import kotlin.math.log10
 
-class SensorReader(private val context: Context,
-                   private val coroutineScope: CoroutineScope) {
+class SensorReader(
+    private val context: Context,
+    private val coroutineScope: CoroutineScope
+) {
     val dataProcessor = SensorDataComputer()
     private val delayTime = 3000L
+
     // HR reading
     private val healthServicesClient by lazy { HealthServices.getClient(context) }
     private val exerciseClient by lazy { healthServicesClient.exerciseClient }
     var bpms: ArrayList<Float> = ArrayList(); private set
+
     // light reading
     private val sensorManager by lazy {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -41,6 +45,7 @@ class SensorReader(private val context: Context,
         sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
     }
     var lightReads: ArrayList<Float> = ArrayList(); private set
+
     //sound
     private var recorder: MediaRecorder? = null
     private var measurementJob: Job? = null
@@ -54,7 +59,8 @@ class SensorReader(private val context: Context,
         override fun onAvailabilityChanged(
             dataType: DataType<*, *>,
             availability: Availability
-        ) {}
+        ) {
+        }
 
         override fun onExerciseUpdateReceived(update: ExerciseUpdate) {
             val state = update.exerciseStateInfo.state
@@ -138,7 +144,7 @@ class SensorReader(private val context: Context,
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            if (accuracy <3) {
+            if (accuracy < 3) {
                 dataProcessor.lightAccuracyLow = true
             }
         }
@@ -204,7 +210,7 @@ class SensorReader(private val context: Context,
      */
     fun takeSoundReading() {
         //ensure safe to proceed and set up
-        // If a measurement is already running, cancel it before starting a new one.
+        //if a measurement is already running, cancel it before starting a new one.
         if (measurementJob?.isActive == true) {
             measurementJob?.cancel()
         }
@@ -212,32 +218,35 @@ class SensorReader(private val context: Context,
         measurementJob = coroutineScope.launch {
             startRecorder()
             // If the recorder failed to start, don't
-    if (recorder == null) {
-        Log.e("LOGPROCESS", "Cannot take reading, recorder is not initialized.")
-        return@launch
-    }
+            if (recorder == null) {
+                Log.e("LOGPROCESS", "Cannot take reading, recorder is not initialized.")
+                return@launch
+            }
 
-    Log.d("LOGPROCESS", "Starting 5-second sound measurement.")
-    soundReadings.clear()
+            Log.d("LOGPROCESS", "Starting 5-second sound measurement.")
+            soundReadings.clear()
 
-    val startTime = System.currentTimeMillis()
-    while (System.currentTimeMillis() - startTime < delayTime) {
-        // Get amplitude and compute decibels
-        val amplitude = recorder?.maxAmplitude ?: 0
-        val db = 20 * log10(amplitude.toDouble())
+            val startTime = System.currentTimeMillis()
+            while (System.currentTimeMillis() - startTime < delayTime) {
+                // Get amplitude and compute decibels
+                val amplitude = recorder?.maxAmplitude ?: 0
+                val db = 20 * log10(amplitude.toDouble())
 
-        if (db.isFinite()) { // Avoid adding -Infinity if amplitude is 0
-            soundReadings.add(db)
+                if (db.isFinite()) { // discard -Infinity (if amplitude is 0)
+                    soundReadings.add(db)
+                }
+
+                Log.v("LOGPROCESS", "Current vol in Decibels: $db")
+                delay(250) // Read the amplitude 4 times per second
+            }
+
+            stopRecorder()
+            Log.d(
+                "LOGPROCESS",
+                "Finished 5-second sound measurement. Readings: ${soundReadings.size}"
+            )
         }
-
-        Log.v("LOGPROCESS", "Current vol in Decibels: $db")
-        delay(250) // Read the amplitude 4 times per second
     }
-
-    stopRecorder()
-    Log.d("LOGPROCESS", "Finished 5-second sound measurement. Readings: ${soundReadings.size}")
-}
-}
 
     /**
      * Stops the audio recorder and remove temp audio file.

@@ -18,6 +18,9 @@ import kotlinx.coroutines.runBlocking
 
 class BackgroundHeartRateService : PassiveListenerService() {
 
+    internal lateinit var sensorReadManager: SensorReader //internal so test can see it
+    internal lateinit var settingsManager: SettingsManager
+
     /**
      * Handle new data points received from the sensors
      */
@@ -25,27 +28,28 @@ class BackgroundHeartRateService : PassiveListenerService() {
         val hrPoints = dataPoints.getData(DataType.HEART_RATE_BPM)
 
         //setup
-        val settingsManager = SettingsManager(applicationContext)
-
-        val serviceScope = MainScope()
-        val sensorReadManager = SensorReader(
-            context = this,
-            coroutineScope = serviceScope
-        )
+        //for preintialised sensorReadManager when testing
+        if (!::sensorReadManager.isInitialized) {
+            sensorReadManager = SensorReader(this, MainScope())
+        }
+        if (!::settingsManager.isInitialized) {
+            settingsManager = SettingsManager(applicationContext)
+        }
+        //val settingsManager = SettingsManager(applicationContext)
+        //sensorReadManager = SensorReader(this, MainScope())
         sensorReadManager.takeLightReading()
         sensorReadManager.takeSoundReading()
         runBlocking { delay(3500L) }
 
         //get settings values
-        val checkingForBright = runBlocking { settingsManager.strobingLightFlow.first() }
-        val checkingForStrobing = runBlocking { settingsManager.brightLightFlow.first() }
+        val checkingForBright = runBlocking { settingsManager.brightLightFlow.first() }
+        val checkingForStrobing = runBlocking { settingsManager.strobingLightFlow.first() }
         val checkingForLoud = runBlocking { settingsManager.loudSoundFlow.first() }
 
         //flags
         var bpmHighEnough = false
 
         //deal with points
-        while (!bpmHighEnough) {
             for (point in hrPoints) {
                 val bpm = point.value
                 Log.d("HRateBG", "Background BPM: $bpm")
@@ -54,20 +58,20 @@ class BackgroundHeartRateService : PassiveListenerService() {
 
                 if (bpm > highHRthreshold) {
                     bpmHighEnough = true
+                    break
                 }
             }
-        }
 
         //compare values
-        if (checkingForBright && sensorReadManager.dataProcessor.isLightBright()) {
+        if (bpmHighEnough && checkingForBright && sensorReadManager.dataProcessor.isLightBright()) {
             sendAlert(getString(R.string.high_hr_detected_with_bright_light_present))
         }
 
-        if (checkingForStrobing && sensorReadManager.dataProcessor.isLightStrobing()) {
+        if (bpmHighEnough && checkingForStrobing && sensorReadManager.dataProcessor.isLightStrobing()) {
             sendAlert(getString(R.string.high_hr_detected_with_strobing_light_present))
         }
 
-        if (checkingForLoud && sensorReadManager.dataProcessor.isLoudSound()) {
+        if (bpmHighEnough && checkingForLoud && sensorReadManager.dataProcessor.isLoudSound()) {
             sendAlert(getString(R.string.high_hr_detected_in_loud_environment))
         }
     }
@@ -75,8 +79,9 @@ class BackgroundHeartRateService : PassiveListenerService() {
     /**
      * Builds and triggers a notification sent to the user, including a vibration.
      * @param message Message of the notification
+     * is internal for testing purposes
      */
-    private fun sendAlert(message: String) {
+    internal fun sendAlert(message: String) {
         val context = applicationContext
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "soverload_alerts"

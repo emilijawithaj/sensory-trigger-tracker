@@ -117,6 +117,8 @@ class WatchListenerService : WearableListenerService() {
                         LogData(
                             dateTime = Instant.parse(dataMap.getString("datetime")),
                             avgLux = dataMap.getFloat("avgLux"),
+                            wasBright = dataMap.getBoolean("wasBright"),
+                            wasLoud = dataMap.getBoolean("wasLoud"),
                             luxStdev = dataMap.getFloat("luxStdev"),
                             lightOther = dataMap.getBoolean("lightOther"),
                             avgDecibels = dataMap.getFloat("avgDecibels"),

@@ -11,8 +11,6 @@ class FrequencyCalcHelper {
 
     companion object {
         //default threshold values
-        var loudSoundDef = 60
-        var brightLightDef = 250f
         var strobingLightDef = 500
 
         /**
@@ -91,13 +89,13 @@ class FrequencyCalcHelper {
                 if (log.luxStdev >= strobingLightDef) {
                     strobeLightCount++
                 }
-                if (log.avgLux >= brightLightDef) {
+                if (log.wasBright) {
                     brightLightCount++
                 }
                 if (log.lightOther) {
                     lightOtherCount++
                 }
-                if (log.avgDecibels >= loudSoundDef) {
+                if (log.wasLoud) {
                     loudSoundCount++
                 }
                 if (log.noiseOther) {
@@ -199,13 +197,11 @@ class FrequencyCalcHelper {
          */
         fun getTrueFactors(context: Context, log: LogData): List<String> {
             //threshold values
-            val loudSoundDef = loudSoundDef
-            val brightLightDef = brightLightDef
             val strobingLightDef = strobingLightDef
 
             val trueFactors = arrayListOf<String>()
 
-            if (log.avgLux > brightLightDef) {
+            if (log.wasBright) {
                 trueFactors.add(context.getString(R.string.factor_brightness))
             }
             if (log.luxStdev > strobingLightDef) {
@@ -214,7 +210,7 @@ class FrequencyCalcHelper {
             if (log.lightOther) {
                 trueFactors.add(context.getString(R.string.factor_light_manual))
             }
-            if (log.avgDecibels > loudSoundDef) {
+            if (log.wasLoud) {
                 trueFactors.add(context.getString(R.string.factor_loud))
             }
             if (log.noiseOther) {

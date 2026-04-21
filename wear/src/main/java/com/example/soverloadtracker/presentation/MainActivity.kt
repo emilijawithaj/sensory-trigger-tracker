@@ -27,6 +27,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.example.soverloadtracker.SqLiteDatabase
+import com.example.soverloadtracker.presentation.dataStorage.LogData
+import com.example.soverloadtracker.presentation.dataStorage.ThresholdData
 import com.example.soverloadtracker.presentation.screens.AppNavigation
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorReader
@@ -48,8 +50,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setTheme(style.Theme_DeviceDefault)
-        //val userDB = SqLiteDatabase.getInstance(this)
-        //userDB.onUpgrade(userDB.writableDatabase, 1, 1)
+        val userDB = SqLiteDatabase.getInstance(this)
+        userDB.onUpgrade(userDB.writableDatabase, 1, 1)
         updateThresholds()
 
         setContent {
@@ -142,9 +144,11 @@ class MainActivity : ComponentActivity() {
         val logData = LogData(
             datetime,
             avgLux,
+            sensorReadManager.dataProcessor.isLightBright(),
             luxStdev,
             lightOther,
             avgDecibels,
+            sensorReadManager.dataProcessor.isLoudSound(),
             noiseOther,
             smellStrong,
             smellOther,
@@ -160,50 +164,36 @@ class MainActivity : ComponentActivity() {
         return logData
     }
 
+    /**
+     * Updates sensor 'high value' threshold using Bayesian Running Probability
+     */
     fun updateThresholds() {
-        val minRecordThreshold = 3
-
         val userDB = SqLiteDatabase.getInstance(this)
-        val brightRecords = userDB.listBrightRecords()
-        val loudRecords = userDB.listLoudnessRecords()
 
-        //check light
-        if (brightRecords.size > minRecordThreshold) {
-            val trueBrightRecords = brightRecords.filter { it.consideredPresent }
-            val falseBrightRecords = brightRecords.filter { !it.consideredPresent }
+        //get thresholds
+        val lightThreshold = SensorDataComputer.HIGH_LIGHT_LEVEL
+        val soundThreshold = SensorDataComputer.DECIBEL_THRESHOLD
 
-            val avgTrue: Double = if (trueBrightRecords.isNotEmpty()) {
-                trueBrightRecords.map { it.value }.average()
-            } else {
-                falseBrightRecords.map { it.value }.average()
-            }
+        //extract data from logs
+        val logs = userDB.listLogRecords()
 
-            val avgFalse: Double = if (falseBrightRecords.isNotEmpty()) {
-                falseBrightRecords.map { it.value }.average()
-            } else {
-                trueBrightRecords.map { it.value }.average()
-            }
-                SensorDataComputer.HIGH_LIGHT_LEVEL = ((avgTrue + avgFalse) / 2).toFloat()
-                Log.d("LOGPROCESS", "New light threshold: ${SensorDataComputer.HIGH_LIGHT_LEVEL}")
+        val brightRecords = logs.map { log -> ThresholdData(log.avgLux, log.wasBright) }
+        val loudRecords = logs.map { log -> ThresholdData(log.avgDecibels, log.wasLoud) }
+
+        val trueBrightRecords = brightRecords.filter { it.consideredPresent }
+        val falseBrightRecords = brightRecords.filter { !it.consideredPresent }
+
+        val trueLoudRecords = loudRecords.filter { it.consideredPresent }
+        val falseLoudRecords = loudRecords.filter { !it.consideredPresent }
+
+        //ensure min sample size
+        if (trueBrightRecords.size > 1 && falseBrightRecords.size > 1) {
+            SensorDataComputer.HIGH_LIGHT_LEVEL =
+                thresholdSweep(falseBrightRecords, trueBrightRecords, lightThreshold)
         }
-        //check sound
-        if (loudRecords.size > minRecordThreshold) {
-            val trueLoudRecords = loudRecords.filter { it.consideredPresent }
-            val falseLoudRecords = loudRecords.filter { !it.consideredPresent }
-
-            val avgTrue: Double = if (trueLoudRecords.isNotEmpty()) {
-                trueLoudRecords.map { it.value }.average()
-            } else {
-                falseLoudRecords.map { it.value }.average()
-            }
-
-            val avgFalse: Double = if (falseLoudRecords.isNotEmpty()) {
-                falseLoudRecords.map { it.value }.average()
-            } else {
-                trueLoudRecords.map { it.value }.average()
-            }
-            SensorDataComputer.DECIBEL_THRESHOLD = ((avgTrue + avgFalse) / 2).toInt()
-            Log.d("LOGPROCESS", "New sound threshold: ${SensorDataComputer.DECIBEL_THRESHOLD}")
+        if (trueLoudRecords.size > 1 && falseLoudRecords.size > 1) {
+            SensorDataComputer.DECIBEL_THRESHOLD =
+                thresholdSweep(falseLoudRecords, trueLoudRecords, soundThreshold.toFloat()).toInt()
         }
     }
 }
@@ -226,6 +216,52 @@ fun WearApp(goToPermissions: () -> Unit, createLog: (Instant) -> LogData) {
         goToPermissions = goToPermissions,
         createLog = createLog
     )
+}
+
+/**
+ * Function to perform threshold sweep to update sensor thresholds.
+ * @param belowRecords existing records that should return false
+ * @param aboveRecords existing records that should return true
+ * @param threshold current threshold value
+ * @return new threshold
+ */
+fun thresholdSweep(belowRecords: List<ThresholdData>, aboveRecords: List<ThresholdData>, threshold: Float): Float {
+    //setup
+    val sortedRecords = (belowRecords + aboveRecords).sortedBy { it.value }
+    var maxMargin = -1.0f
+    var highestAccuracyFound = 0
+    var bestThreshold = threshold
+
+    for (i in 0 until sortedRecords.size - 1) {
+
+        //propose a candidate
+        val candidate = (sortedRecords[i].value + sortedRecords[i + 1].value) / 2
+
+        //count candidate errors
+        val correctlyClassified = (aboveRecords.count { it.value >= candidate } +
+                belowRecords.count { it.value < candidate })
+
+        //find gap between points seperated
+        val margin = sortedRecords[i + 1].value - sortedRecords[i].value
+
+        //save if best option so far
+        if (correctlyClassified > highestAccuracyFound ||
+            (correctlyClassified == highestAccuracyFound && margin > maxMargin)) {
+
+            highestAccuracyFound = correctlyClassified
+            maxMargin = margin
+            bestThreshold = candidate
+        }
+    }
+
+    //select only if more than 80%
+    //use Bayesian running probability to smooth results
+    return if (highestAccuracyFound >= sortedRecords.size * 0.8) {
+        val alpha = 0.3f
+        (threshold * (1 - alpha)) + (bestThreshold * alpha)
+    } else {
+        threshold
+    }
 }
 
 

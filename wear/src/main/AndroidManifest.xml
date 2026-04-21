@@ -32,6 +32,7 @@
             android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING"
             android:exported="true">
         </service>
+
         <service
             android:name=".complication.MainComplicationService"
             android:exported="true"
@@ -98,7 +99,6 @@
             android:theme="@style/MainActivityTheme.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

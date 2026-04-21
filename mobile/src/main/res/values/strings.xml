@@ -54,6 +54,8 @@
     <string name="add_tag_prompt">e.g. Fatigue</string>
     <string name="delete_log_button">Delete Log</string>
     <string name="calendar_month">%1$s</string>
+    <string name="data_saved">Data Saved</string>
+    <string name="trigger_cannot_be_empty">Trigger cannot be empty</string>
 
     <!-- Details page -->
     <string-array name="tabTitles">

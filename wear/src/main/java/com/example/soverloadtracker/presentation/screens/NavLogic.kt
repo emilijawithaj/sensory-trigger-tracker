@@ -1,5 +1,6 @@
 package com.example.soverloadtracker.presentation.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +31,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
-import com.example.soverloadtracker.presentation.LogData
+import com.example.soverloadtracker.presentation.PhoneListenerService
+import com.example.soverloadtracker.presentation.dataStorage.LogData
 import com.example.soverloadtracker.presentation.dataStorage.SettingsManager
 import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
 import com.example.soverloadtracker.presentation.reminders.ReminderWorker
@@ -139,13 +141,19 @@ fun AppNavigation(
 
         // Tag menu
         composable(Destinations.TAGS_MENU) {
+            val context = LocalContext.current
+
             AddTagsPage(activeLog!!) { log ->
                 activeLog = log
-                activeLog?.let {
+                activeLog?.let{
+
+                    //add log and sync
                     database.addLogRecord(it)
+
+                    //send to end button
                     navController.navigate(Destinations.END_BUTTON) {
                         popUpTo(Destinations.END_BUTTON) { inclusive = true }
-                    }
+                    };
                 }
             }
         }

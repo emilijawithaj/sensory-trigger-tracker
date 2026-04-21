@@ -1,5 +1,6 @@
 ﻿package com.example.soverloadtracker.detailsViews
 
+import android.R.attr.contentDescription
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -93,6 +94,9 @@ class LogsHistoryFragment : Fragment() {
 
             //card settings
             val card = MaterialCardView(requireContext()).apply {
+                //description for testing
+                contentDescription = "${log.dateTime}"
+
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT

@@ -67,7 +67,8 @@ class EditTriggersActivity : AppCompatActivity() {
 
                     //success and close
                     val snackbar =
-                        Snackbar.make(activityRootView, "Data Saved", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(activityRootView,
+                            getString(R.string.data_saved), Snackbar.LENGTH_SHORT)
                     snackbar.show()
                     dialog.dismiss()
                     generateTriggerChips()
@@ -76,7 +77,8 @@ class EditTriggersActivity : AppCompatActivity() {
                 else {
                     //show error
                     val snackbar =
-                        Snackbar.make(activityRootView, "Trigger cannot be empty", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(activityRootView,
+                            getString(R.string.trigger_cannot_be_empty), Snackbar.LENGTH_SHORT)
                     snackbar.show()
                 }
             }

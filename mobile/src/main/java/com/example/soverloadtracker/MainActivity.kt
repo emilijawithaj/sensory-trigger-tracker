@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStart() {
         super.onStart()
         registerReceiver(
@@ -83,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        //database.onUpgrade(database.writableDatabase, 1, 1)
+        database.onUpgrade(database.writableDatabase, 1, 1)
 
         //button listeners
         val syncButton: Button = findViewById(R.id.sync)

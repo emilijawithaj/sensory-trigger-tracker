@@ -122,7 +122,7 @@ class EditLogActivity(): AppCompatActivity() {
      * Presets the checkboxes for factors to be checked if they are present in the log
      */
     fun updateCheckBoxes() {
-        if (log.avgLux > FrequencyCalcHelper.brightLightDef) {
+        if (log.wasBright) {
             brightLightChk.isChecked = true
         }
         if (log.luxStdev > FrequencyCalcHelper.strobingLightDef) {
@@ -131,7 +131,7 @@ class EditLogActivity(): AppCompatActivity() {
         if (log.lightOther) {
             lightOtherChk.isChecked = true
         }
-        if (log.avgDecibels > FrequencyCalcHelper.loudSoundDef) {
+        if (log.wasLoud) {
             loudSoundChk.isChecked = true
         }
         if (log.noiseOther) {
@@ -203,18 +203,6 @@ class EditLogActivity(): AppCompatActivity() {
 
     fun updateDatabase() {
         //update factors
-
-        //deal with non Bool factors - set to 999 if checked and previously wasn't, -1 if unchecked when previously was, leave as before otherwise
-        if (brightLightChk.isChecked && log.avgLux != 999f) {
-            newLog.avgLux = 999f
-        }
-        else if (!brightLightChk.isChecked && log.avgLux > FrequencyCalcHelper.brightLightDef) {
-            newLog.avgLux = -1f
-        }
-        else {
-            newLog.avgLux = log.avgLux
-        }
-
         if (strobeLightChk.isChecked && log.luxStdev != 999f) {
             newLog.luxStdev = 999f
         }
@@ -225,17 +213,10 @@ class EditLogActivity(): AppCompatActivity() {
             newLog.luxStdev = log.luxStdev
         }
 
-        if (loudSoundChk.isChecked && log.avgDecibels != 999f) {
-            newLog.avgDecibels = 999f
-        }
-        else if (!loudSoundChk.isChecked && log.avgDecibels > FrequencyCalcHelper.loudSoundDef) {
-            newLog.avgDecibels = -1f
-        }
-        else {
-            newLog.avgDecibels = log.avgDecibels
-        }
 
         //handle other
+        newLog.wasBright = brightLightChk.isChecked
+        newLog.wasLoud =  loudSoundChk.isChecked
         newLog.lightOther = lightOtherChk.isChecked
         newLog.noiseOther = otherSoundChk.isChecked
         newLog.smellOther = smellOtherChk.isChecked
