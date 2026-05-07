@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setTheme(style.Theme_DeviceDefault)
         val userDB = SqLiteDatabase.getInstance(this)
-        userDB.onUpgrade(userDB.writableDatabase, 1, 1)
+        //userDB.onUpgrade(userDB.writableDatabase, 1, 1)
         updateThresholds()
 
         setContent {

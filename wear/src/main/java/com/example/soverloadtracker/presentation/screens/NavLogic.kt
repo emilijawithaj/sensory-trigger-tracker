@@ -1,6 +1,5 @@
 package com.example.soverloadtracker.presentation.screens
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -93,9 +92,11 @@ fun AppNavigation(
 
         // Skip or Add Factors
         composable(Destinations.EXTRA_FACTORS) {
+            val context = LocalContext.current
             ExtraFactorsPrompt(
                 onSkip = {
                     activeLog?.let { database.addLogRecord(it)}
+                    PhoneListenerService.syncLogsToPhone(context)
                     navController.navigate(Destinations.END_BUTTON) {
                         popUpTo(Destinations.END_BUTTON) { inclusive = true }
                     }
@@ -149,6 +150,7 @@ fun AppNavigation(
 
                     //add log and sync
                     database.addLogRecord(it)
+                    PhoneListenerService.syncLogsToPhone(context)
 
                     //send to end button
                     navController.navigate(Destinations.END_BUTTON) {

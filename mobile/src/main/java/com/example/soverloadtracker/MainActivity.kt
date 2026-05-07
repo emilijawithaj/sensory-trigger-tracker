@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.util.TypedValue.applyDimension
@@ -12,7 +11,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -82,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        database.onUpgrade(database.writableDatabase, 1, 1)
+        //database.onUpgrade(database.writableDatabase, 1, 1)
 
         //button listeners
         val syncButton: Button = findViewById(R.id.sync)
