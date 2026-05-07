@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 class SettingsViewModel(private val settingsManager: SettingsManager, val appContext: Context) :
     ViewModel() {
 
-    // Bools
+    //Bools
     val isBackgroundTrackingEnabled = settingsManager.backgroundTrackingFlow
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
@@ -47,7 +47,7 @@ class SettingsViewModel(private val settingsManager: SettingsManager, val appCon
             } catch (e: Exception) {
                 e.printStackTrace()
 
-                //reset the toggle so the UI stays in sync
+                //reset toggle so UI stays in sync
                 settingsManager.updateSetting(SettingsManager.BACKGROUND_TRACKING, false)
                 //show Toast message on main thread
                 withContext(Dispatchers.Main) {

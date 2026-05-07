@@ -7,16 +7,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.MediaRecorder
 import android.util.Log
-import androidx.health.services.client.ExerciseUpdateCallback
 import androidx.health.services.client.HealthServices
-import androidx.health.services.client.data.Availability
-import androidx.health.services.client.data.DataType
-import androidx.health.services.client.data.ExerciseConfig
-import androidx.health.services.client.data.ExerciseLapSummary
-import androidx.health.services.client.data.ExerciseType
-import androidx.health.services.client.data.ExerciseUpdate
-import androidx.health.services.client.endExercise
-import androidx.health.services.client.startExercise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -32,12 +23,12 @@ class SensorReader(
     val dataProcessor = SensorDataComputer()
     private val delayTime = 3000L
 
-    // HR reading
+    //HR reading
     private val healthServicesClient by lazy { HealthServices.getClient(context) }
     private val exerciseClient by lazy { healthServicesClient.exerciseClient }
     var bpms: ArrayList<Float> = ArrayList(); private set
 
-    // light reading
+    //light reading
     private val sensorManager by lazy {
         context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     }
@@ -51,87 +42,8 @@ class SensorReader(
     private var measurementJob: Job? = null
     val soundReadings: ArrayList<Double> = ArrayList()
 
-
     /**
-     * Callback for HR streaming. Is set up as a generic workout for data access purposes
-     */
-    private val hrUpdateCallback = object : ExerciseUpdateCallback {
-        override fun onAvailabilityChanged(
-            dataType: DataType<*, *>,
-            availability: Availability
-        ) {
-        }
-
-        override fun onExerciseUpdateReceived(update: ExerciseUpdate) {
-            val state = update.exerciseStateInfo.state
-            if (state.isEnded) {
-                //Measurement ended
-                Log.d("SOBOOT", "Exercise has ended.")
-                return
-            }
-
-            // Get latest heart rate data point
-            val latestMetrics = update.latestMetrics
-            val heartRateDataPoints = latestMetrics.getData(DataType.HEART_RATE_BPM)
-
-            if (heartRateDataPoints.isNotEmpty()) {
-                val bpm = heartRateDataPoints.last().value
-                Log.d("OUTPUTPRESENT", "Current BPM: $bpm")
-                bpms.add(bpm.toFloat()) // Add BPM to list
-            }
-        }
-
-        override fun onLapSummaryReceived(lapSummary: ExerciseLapSummary) {}
-        override fun onRegistered() {}
-        override fun onRegistrationFailed(throwable: Throwable) {}
-    }
-
-    /**
-     * start BPM measuring stream
-     */
-    fun startHeartRateStreaming() {
-        coroutineScope.launch {
-            //set up callback
-            exerciseClient.setUpdateCallback(hrUpdateCallback)
-            bpms.clear()
-
-            val dataTypes = setOf(DataType.HEART_RATE_BPM)
-            //config generic workout
-            val config = ExerciseConfig.builder(ExerciseType.WORKOUT)
-                .setDataTypes(dataTypes)
-                .build()
-
-            try {
-                //start the exercise. This will trigger the onExerciseUpdateReceived callback.
-                exerciseClient.startExercise(config)
-                Log.d("LOGREAD", "Exercise started successfully.")
-                delay(delayTime) // Wait
-                Log.d("OUTPUTPRESENT", "5 second timer finished. Stopping heart rate streaming.")
-                stopHeartRateStreaming()
-            } catch (e: Exception) {
-                Log.e("LOGREAD", "Failed to start exercise", e)
-            }
-        }
-    }
-
-    /**
-     * kill BPM measuring stream
-     */
-    fun stopHeartRateStreaming() {
-        coroutineScope.launch {
-            try {
-                exerciseClient.endExercise()
-                dataProcessor.bpms = bpms
-                Log.d("LOGREAD", "Exercise ended successfully.")
-            } catch (e: Exception) {
-                Log.e("LOGREAD", "Failed to end exercise", e)
-            }
-        }
-    }
-
-
-    /**
-     * Light sensor listener - receive and  handle sensor data
+     * Light sensor listener - receive and handle sensor data
      */
     private val lightSensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
@@ -151,7 +63,7 @@ class SensorReader(
     }
 
     /**
-     * Get a single light sensor reading.
+     * Get a single light sensor reading
      */
     fun takeLightReading() {
         if (lightSensor == null) {
@@ -181,7 +93,7 @@ class SensorReader(
     }
 
     /**
-     * Setup and start audio recorder.
+     * Setup and start audio recorder
      */
     private fun startRecorder() {
         // Use cache to temporarily hold audio data while processing
@@ -206,7 +118,7 @@ class SensorReader(
     }
 
     /**
-     * Record and collect amplitude readings in decibels.
+     * Record and collect amplitude readings in decibels
      */
     fun takeSoundReading() {
         //ensure safe to proceed and set up
@@ -249,7 +161,7 @@ class SensorReader(
     }
 
     /**
-     * Stops the audio recorder and remove temp audio file.
+     * Stops the audio recorder and remove temp audio file
      */
     private fun stopRecorder() {
         dataProcessor.soundReadings = soundReadings

@@ -1,4 +1,4 @@
-/* App logging various environmental factors on button press to track trends in logging environments
+/** App logging various environmental factors on button press to track trends in logging environments
  */
 
 package com.example.soverloadtracker.presentation
@@ -50,8 +50,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         setTheme(style.Theme_DeviceDefault)
-        val userDB = SqLiteDatabase.getInstance(this)
-        userDB.onUpgrade(userDB.writableDatabase, 1, 1)
+        //val userDB = SqLiteDatabase.getInstance(this)
+        //userDB.onUpgrade(userDB.writableDatabase, 1, 1)
         updateThresholds()
 
         setContent {
@@ -109,14 +109,13 @@ class MainActivity : ComponentActivity() {
                     permissionLauncher.launch(p)
                 }
 
-                //Ask
+                //ask permission
                 else -> {
                     Log.d("SOBOOT", "Requesting permission.")
                     permissionLauncher.launch(p)
                 }
             }
         }
-        sensorReadManager.startHeartRateStreaming()
         sensorReadManager.takeLightReading()
         sensorReadManager.takeSoundReading()
     }

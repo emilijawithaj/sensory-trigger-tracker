@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,10 +26,7 @@ import androidx.wear.compose.material3.Text
 import com.example.soverloadtracker.R
 import com.example.soverloadtracker.SqLiteDatabase
 import com.example.soverloadtracker.presentation.dataStorage.LogData
-import com.example.soverloadtracker.presentation.dataStorage.ThresholdData
 import com.example.soverloadtracker.presentation.sensorDataGathering.SensorDataComputer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 /**
@@ -40,7 +36,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun LogTouchMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
-    // state management for toggles
+    //state management for toggles
     var textureSelected by remember { mutableStateOf(currentLog.tactileBad) }
     var personalSpaceSelected by remember { mutableStateOf(currentLog.tactilePersonalContact) }
     var otherSelected by remember { mutableStateOf(currentLog.tactileOther) }
@@ -91,7 +87,7 @@ fun LogTouchMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
                 }
             }
 
-            //Next button
+            //next button
             item {
                 Button(
                     onClick = {
@@ -167,7 +163,7 @@ fun LogSmellMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
                 }
             }
 
-            //Next button
+            //next button
             item {
                 Button(
                     onClick = {
@@ -251,7 +247,7 @@ fun LogTasteMenu(currentLog: LogData, onNext: (LogData) -> Unit) {
                 }
             }
 
-            //Next button
+            //next button
             item {
                 Button(
                     onClick = {
@@ -337,7 +333,7 @@ fun LogLightMenu(currentLog: LogData, onNext: (LogData) -> Unit, database: SqLit
                 }
             }
 
-            //Next button
+            //next button
             item {
                 Button(
                     onClick = {

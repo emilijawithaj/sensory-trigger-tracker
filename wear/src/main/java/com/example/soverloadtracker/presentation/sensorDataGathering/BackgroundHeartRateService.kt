@@ -112,7 +112,7 @@ class BackgroundHeartRateService : PassiveListenerService() {
         val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
         vibrator.vibrate(vibrationEffect)
 
-        // Show Notification
+        //show notification
         notificationManager.notify(getString(R.string.potential_overload_alert).hashCode(), notification)
 
         Log.d("HRateBG", "Alert sent")

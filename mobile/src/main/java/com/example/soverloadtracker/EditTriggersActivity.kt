@@ -139,7 +139,7 @@ class EditTriggersActivity : AppCompatActivity() {
         val tagFrequencies = FrequencyCalcHelper.calculateTagPercentages(tags, logs.size)
         val existingTriggers = database.getTriggers()
 
-        //filter by commonality
+        //filter
         for (factor in factorFrequencies) {
             if (factor.value >= threshold && !existingTriggers.contains(factor.key)) {
                 factors[factor.key] = factor.value

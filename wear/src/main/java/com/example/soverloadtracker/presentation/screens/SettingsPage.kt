@@ -20,7 +20,7 @@ import com.example.soverloadtracker.presentation.dataStorage.SettingsViewModel
 
 @Composable
 fun SettingsPage(viewModel: SettingsViewModel) {
-    // Collect the state from the ViewModel
+    // collect states from ViewModel
     val isBackgroundTrackingEnabled by viewModel.isBackgroundTrackingEnabled.collectAsState()
     val isAutoTriggersEnabled by viewModel.isAutoTriggersEnabled.collectAsState()
     val isBrightLightEnabled by viewModel.isBrightLightEnabled.collectAsState()

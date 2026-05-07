@@ -41,7 +41,7 @@ fun AddTagsPage(currentLog: LogData, onNext: (LogData) -> Unit) {
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title
+            //Title
             item {
                 Text(
                     text = stringResource(R.string.tags_page_title),
@@ -50,7 +50,7 @@ fun AddTagsPage(currentLog: LogData, onNext: (LogData) -> Unit) {
                 )
             }
 
-            // Text Input Field
+            //Text Input Field
             item {
                 TextField(
                     value = tagText,
@@ -66,7 +66,7 @@ fun AddTagsPage(currentLog: LogData, onNext: (LogData) -> Unit) {
                 )
             }
 
-            // Add Button
+            //Add Button
             item {
                 Button(
                     onClick = {

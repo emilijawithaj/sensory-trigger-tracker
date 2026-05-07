@@ -1,6 +1,5 @@
 package com.example.soverloadtracker.presentation.screens
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -54,7 +53,7 @@ fun AppNavigation(
         navController = navController,
         startDestination = Destinations.LOG_BUTTON
     ) {
-        // Main Button Page
+        //Main page
         composable(Destinations.LOG_BUTTON) {
             LogButton(
                 logButtonOnClick = {
@@ -65,7 +64,7 @@ fun AppNavigation(
             )
         }
 
-        // Loading Sensor Data
+        //loading sensor data display
         composable(Destinations.LOADING) {
             LaunchedEffect(Unit) {
                 delay(5100)
@@ -73,7 +72,7 @@ fun AppNavigation(
                 navController.navigate(Destinations.EXTRA_FACTORS)
             }
             LaunchedEffect(Unit) {
-                delay(5100) // 5 seconds for sensor readings + small buffer
+                delay(5100) //5 seconds for sensor readings + small buffer
                 activeLog = createLog(Instant.now())
             }
 
@@ -93,9 +92,11 @@ fun AppNavigation(
 
         // Skip or Add Factors
         composable(Destinations.EXTRA_FACTORS) {
+            val context = LocalContext.current
             ExtraFactorsPrompt(
                 onSkip = {
                     activeLog?.let { database.addLogRecord(it)}
+                    PhoneListenerService.syncLogsToPhone(context)
                     navController.navigate(Destinations.END_BUTTON) {
                         popUpTo(Destinations.END_BUTTON) { inclusive = true }
                     }
@@ -139,7 +140,7 @@ fun AppNavigation(
             }
         }
 
-        // Tag menu
+        //tag menu
         composable(Destinations.TAGS_MENU) {
             val context = LocalContext.current
 
@@ -149,6 +150,7 @@ fun AppNavigation(
 
                     //add log and sync
                     database.addLogRecord(it)
+                    PhoneListenerService.syncLogsToPhone(context)
 
                     //send to end button
                     navController.navigate(Destinations.END_BUTTON) {
@@ -158,12 +160,12 @@ fun AppNavigation(
             }
         }
 
-        //End button
+        //end button
         composable(Destinations.END_BUTTON) {
             val context = LocalContext.current
             val workManager = remember { WorkManager.getInstance(context) }
 
-            // Schedule notification when this page is entered
+            //schedule notification when this page is entered
             LaunchedEffect(Unit) {val reminderRequest = OneTimeWorkRequestBuilder<ReminderWorker>()
                 .setInitialDelay(2, TimeUnit.HOURS)
                 .addTag("log_reminder")
@@ -176,7 +178,7 @@ fun AppNavigation(
                 )
             }
             EndButton {
-                //cancel notification if the button gets pressed
+                //cancel notification if end buttonpressed
                 workManager.cancelUniqueWork("end_button_reminder")
 
                 navController.navigate(Destinations.LOG_BUTTON) {
@@ -185,7 +187,7 @@ fun AppNavigation(
             }
         }
 
-        //Settings
+        //settings
         composable(Destinations.SETTINGS) {
             //set up settings ViewModel
             val context = LocalContext.current

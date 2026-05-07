@@ -59,9 +59,9 @@ class PhoneListenerService : WearableListenerService() {
 
 
     /**
-     * Send all logs in the database as DataItems to the phone
+     * Send logs in the database as DataItems to the phone
      */
-    private fun syncLogsToPhone() {
+    fun syncLogsToPhone() {
         serviceScope.launch {
             //fetch database logs as list of LogData
             val logs = database.listLogRecords()
@@ -77,6 +77,8 @@ class PhoneListenerService : WearableListenerService() {
                     val dataMap = DataMap().apply {
                         putString("datetime", log.dateTime.toString())
                         putFloat("avgLux", log.avgLux)
+                        putBoolean("wasBright", log.wasBright)
+                        putBoolean("wasLoud", log.wasLoud)
                         putFloat("luxStdev", log.luxStdev)
                         putBoolean("lightOther", log.lightOther)
                         putFloat("avgDecibels", log.avgDecibels)
@@ -164,6 +166,65 @@ class PhoneListenerService : WearableListenerService() {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error sending mark end message.", e)
+                }
+            }
+        }
+
+        /**
+         * Send logs in the database as DataItems to the phone
+         */
+        fun syncLogsToPhone(context: Context) {
+            CoroutineScope(Dispatchers.IO).launch {
+                //fetch database logs as list of LogData
+                val database = SqLiteDatabase.getInstance(context)
+                val logs = database.listLogRecords()
+                if (logs.isEmpty()) {
+                    Log.d(TAG, "No logs to sync.")
+                    return@launch
+                }
+
+                try {
+                    //make DataMap for each log entry
+                    val logDataMapList = ArrayList<DataMap>()
+                    for (log in logs) {
+                        val dataMap = DataMap().apply {
+                            putString("datetime", log.dateTime.toString())
+                            putFloat("avgLux", log.avgLux)
+                            putBoolean("wasBright", log.wasBright)
+                            putBoolean("wasLoud", log.wasLoud)
+                            putFloat("luxStdev", log.luxStdev)
+                            putBoolean("lightOther", log.lightOther)
+                            putFloat("avgDecibels", log.avgDecibels)
+                            putBoolean("noiseOther", log.noiseOther)
+                            putBoolean("smellStrong", log.smellStrong)
+                            putBoolean("smellOther", log.smellOther)
+                            putBoolean("tactileBad", log.tactileBad)
+                            putBoolean("tactilePersonalContact", log.tactilePersonalContact)
+                            putBoolean("tactileOther", log.tactileOther)
+                            putBoolean("tasteStrong", log.tasteStrong)
+                            putBoolean("tasteBad", log.tasteBad)
+                            putBoolean("tasteOther", log.tasteOther)
+                            putStringArrayList("tags", log.tags)
+                        }
+                        logDataMapList.add(dataMap)
+                    }
+
+                    //send
+                    withContext(NonCancellable) {
+                        val putDataMapRequest = PutDataMapRequest.create("/syncLogs").apply {
+                            dataMap.putDataMapArrayList("logList", logDataMapList)
+                            dataMap.putLong("timestamp", System.currentTimeMillis())
+                        }
+
+                        val putDataRequest = putDataMapRequest.asPutDataRequest()
+                        val dataClient = Wearable.getDataClient(context)
+                        dataClient.putDataItem(putDataRequest).await()
+
+                        Log.d(TAG, "Successfully sent ${logs.size} logs to the phone.")
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to send log data to phone.", e)
                 }
             }
         }

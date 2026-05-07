@@ -1,6 +1,5 @@
 ﻿package com.example.soverloadtracker.detailsViews
 
-import android.R.attr.contentDescription
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -45,11 +44,13 @@ class LogsHistoryFragment : Fragment() {
      * Insert a calendar and populate it with highlights of the days a log has been recorded
      */
     fun fillCalendar() {
-        val calendarView = requireView().findViewById<com.kizitonwose.calendar.view.CalendarView>(R.id.calendarView)
+        val calendarView =
+            requireView().findViewById<com.kizitonwose.calendar.view.CalendarView>(R.id.calendarView)
         val monthText = requireView().findViewById<TextView>(R.id.calendarMonthText)
 
         val logs = database.listLogRecords().sortedByDescending { it.dateTime }
-        val loggedDates = logs.map { LocalDate.ofInstant(it.dateTime, ZoneId.systemDefault())}.toSet()
+        val loggedDates =
+            logs.map { LocalDate.ofInstant(it.dateTime, ZoneId.systemDefault()) }.toSet()
 
         //set up calendar binder for the days
         calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
@@ -58,7 +59,7 @@ class LogsHistoryFragment : Fragment() {
             override fun bind(container: DayViewContainer, data: CalendarDay) {
                 container.textView.text = data.date.dayOfMonth.toString()
 
-                // Highlight if a log exists on this date
+                //highlight if a log exists on this date
                 if (loggedDates.contains(data.date)) {
                     container.textView.setBackgroundResource(R.drawable.calendar_highlight)
                 } else {
