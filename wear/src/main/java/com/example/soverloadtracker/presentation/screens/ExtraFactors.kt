@@ -48,7 +48,7 @@ fun ExtraFactorsPrompt(onSkip: () -> Unit, onAddFactors: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //Skip button
+        //skip button
         Button(
             onClick = { onSkip() },
             modifier = Modifier
@@ -70,7 +70,7 @@ fun ExtraFactorsPrompt(onSkip: () -> Unit, onAddFactors: () -> Unit) {
             )
         }
 
-        //Factors button
+        //factors button
         FilledTonalButton(
             onClick = { onAddFactors() },
             modifier = Modifier
@@ -114,7 +114,7 @@ fun FactorMainMenu(
             )
         }
 
-        // Grid-like layout using Rows
+        //rows for grid layout
         item {
             Row {
                 FactorIconButton(

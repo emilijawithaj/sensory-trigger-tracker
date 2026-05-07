@@ -58,11 +58,11 @@ class EditLogActivity(): AppCompatActivity() {
         val timestampString = intent.getStringExtra("LOG_TIMESTAMP")
         if (timestampString != null) {
             val timestamp = Instant.parse(timestampString)
-            // Re-fetch the full log object from DB
+            //refetch the full log object from db
             log = database.retrieveLog(timestamp)!!
             newLog = database.retrieveLog(timestamp)!!
         } else {
-            // finish activity if fail to get log
+            //finish activity if fail to get log
             finish()
             return
         }
